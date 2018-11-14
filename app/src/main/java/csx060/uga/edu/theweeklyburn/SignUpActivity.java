@@ -16,6 +16,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -24,8 +27,13 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView emailInput;
     private TextView passwordInput;
     private TextView passwordConfirmation;
+    private TextView firstName;
+    private TextView lastName;
+    private TextView phoneNum;
     private TextView passwordMessage;
     private FirebaseAuth auth;
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference ref = database.getReference("Information");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,9 @@ public class SignUpActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.passwordField);
         passwordConfirmation = findViewById(R.id.confirmPasswordField);
         passwordConfirmation.addTextChangedListener(new PasswordListener());
+        firstName = findViewById(R.id.fname);
+        lastName = findViewById(R.id.lname);
+        phoneNum = findViewById(R.id.phone);
         passwordMessage = findViewById(R.id.passwordMessage);
 
 
@@ -84,8 +95,11 @@ public class SignUpActivity extends AppCompatActivity {
     private class SignUpOnClickListener implements View.OnClickListener {
         public void onClick(View view) {
 
-            String email = emailInput.getText().toString().trim();
-            String password = passwordInput.getText().toString().trim();
+            final String email = emailInput.getText().toString().trim();
+            final String password = passwordInput.getText().toString().trim();
+            final String fname = firstName.getText().toString().trim();
+            final String lname = lastName.getText().toString().trim();
+            final String phone = phoneNum.getText().toString().trim();
 
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
@@ -97,28 +111,48 @@ public class SignUpActivity extends AppCompatActivity {
                 return;
             }
 
+            if (TextUtils.isEmpty(fname)) {
+                Toast.makeText(getApplicationContext(), "Enter your first name!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (TextUtils.isEmpty(lname)) {
+                Toast.makeText(getApplicationContext(), "Enter your last name!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (TextUtils.isEmpty(phone)) {
+                Toast.makeText(getApplicationContext(), "Enter your phone number!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (password.length() < 6) {
                 Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            //User newUser = new User(fname, lname, email, phone);
+
             auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            Toast.makeText(SignUpActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(SignUpActivity.this, "Authentication failed." + task.getException(),
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-                                finish();
-                            }
-                        }
-                    });
+            .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    Toast.makeText(SignUpActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                    // If sign in fails, display a message to the user. If sign in succeeds
+                    // the auth state listener will be notified and logic to handle the
+                    // signed in user can be handled in the listener.
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(SignUpActivity.this, "Authentication failed." + task.getException(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        DatabaseReference usersRef = ref.child("users");
+                        usersRef.child(auth.getUid()).setValue(new User(fname, lname, email, phone));
+                        startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                        finish();
+                    }
+                }
+            });
         }
     }
 }
