@@ -53,9 +53,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         auth.signOut();
-        getActivity().startActivity(new Intent(getActivity(), LoginActivity.class));
+//        getActivity().startActivity(new Intent(getActivity(), LoginActivity.class));
+        Intent loginScreen = new Intent(getActivity(), LoginActivity.class);
+
         Toast.makeText(getActivity(), "Successfully signed out", Toast.LENGTH_LONG).show();
         getActivity().finish();
+        loginScreen.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(loginScreen);
     }
 
 }
