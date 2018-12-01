@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "661829542759",
+    "firebase_url": "https://theweeklyburn-616e9.firebaseio.com",
+    "project_id": "theweeklyburn-616e9",
+    "storage_bucket": "theweeklyburn-616e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661829542759:android:2b4ee1d3fedf10a7",
+        "android_client_info": {
+          "package_name": "csx060.uga.edu.theweeklyburn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661829542759-cc5tugpvc55eqorbcu9apm3p7ciujr3t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "csx060.uga.edu.theweeklyburn",
+            "certificate_hash": "4665d24472c6a603b35a3ac2d84db78b705fb798"
+          }
+        },
+        {
+          "client_id": "661829542759-8eo3c7fvuh2qj8q17lghb3b2qttv1u2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs8HcB4Tl2guh5UDmOnzlXONc1ucfyQiw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "661829542759-8eo3c7fvuh2qj8q17lghb3b2qttv1u2s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
