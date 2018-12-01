@@ -3,6 +3,7 @@ package csx060.uga.edu.theweeklyburn;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseListOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -29,12 +32,17 @@ import com.google.firebase.database.Query;
  */
 public class FriendsFragment extends Fragment {
 
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+
     private RecyclerView userList;
     private DatabaseReference userDatabase;
+    private DatabaseReference relationshipDatabase;
     private FirebaseRecyclerOptions<User> options;
     private FirebaseRecyclerAdapter<User, UserViewHolder> adapter;
     private SearchView searchView;
-    private Query firebaseSearchQuery;
+    private String currentUserEmail;
+
+    DatabaseReference RelationRef = database.getReference("Relationships");
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -45,8 +53,13 @@ public class FriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_friends, container, false);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            currentUserEmail = user.getEmail();
+        }
 
-        userDatabase = FirebaseDatabase.getInstance().getReference().child("Information").child("users");
+        userDatabase = database.getReference().child("Information").child("users");
+        relationshipDatabase = RelationRef.child("users");
 
         userList = (RecyclerView) view.findViewById(R.id.userList);
         userList.setHasFixedSize(true);
@@ -88,6 +101,7 @@ public class FriendsFragment extends Fragment {
                 .setQuery(userDatabase, User.class)
                 .build();
 
+
         adapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options){
             @Override
             protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
@@ -98,20 +112,22 @@ public class FriendsFragment extends Fragment {
                 viewHolder.setUserPhone(users.getPhoneNumber());
                 viewHolder.setUserImage(R.drawable.icon);
 
-                viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Button addRemoveButton = (Button) v;
-                        if(addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
-                            addRemoveButton.setText("Remove");
-                            notifyDataSetChanged();
+                if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
+                    viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Button addRemoveButton = (Button) v;
+                            if (addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
+                                addRemoveButton.setText("Remove");
+                            } else {
+                                addRemoveButton.setText("Add");
+                            }
                         }
-                        else{
-                            addRemoveButton.setText("Add");
-                            notifyDataSetChanged();
-                        }
-                    }
-                });
+                    });
+                }
+                else{
+                    viewHolder.addRemoveButton.setVisibility(View.GONE);
+                }
             }
 
             @NonNull
@@ -144,20 +160,22 @@ public class FriendsFragment extends Fragment {
                 viewHolder.setUserPhone(users.getPhoneNumber());
                 viewHolder.setUserImage(R.drawable.icon);
 
-                viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Button addRemoveButton = (Button) v;
-                        if(addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
-                            addRemoveButton.setText("Remove");
-                            notifyDataSetChanged();
+                if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
+                    viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Button addRemoveButton = (Button) v;
+                            if (addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
+                                addRemoveButton.setText("Remove");
+                            } else {
+                                addRemoveButton.setText("Add");
+                            }
                         }
-                        else{
-                            addRemoveButton.setText("Add");
-                            notifyDataSetChanged();
-                        }
-                    }
-                });
+                    });
+                }
+                else{
+                    viewHolder.addRemoveButton.setVisibility(View.GONE);
+                }
             }
 
             @NonNull

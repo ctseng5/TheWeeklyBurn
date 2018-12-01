@@ -6,9 +6,10 @@ public class User {
     public String lastName;
     public String email;
     public String phoneNumber;
+    public String uid;
 
     public User(){
-
+        this.uid = "";
     }
 
     public User(String firstName, String lastName, String email, String phoneNumber) {
@@ -16,6 +17,10 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+    }
+
+    public User(String uid){
+        this.uid = uid;
     }
 
     public String getFirstName() {
@@ -48,5 +53,13 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }
