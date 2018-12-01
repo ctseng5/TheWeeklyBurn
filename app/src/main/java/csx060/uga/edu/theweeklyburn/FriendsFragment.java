@@ -32,6 +32,7 @@ import com.google.firebase.database.Query;
  */
 public class FriendsFragment extends Fragment {
 
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     private RecyclerView userList;
@@ -123,7 +124,7 @@ public class FriendsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
                 String fullName = users.getFirstName() + " " + users.getLastName();
-
+                final String otherUid = users.getUid();
                 UserViewHolder viewHolder = holder;
                 viewHolder.setUserName(fullName);
                 viewHolder.setUserPhone(users.getPhoneNumber());
@@ -136,8 +137,14 @@ public class FriendsFragment extends Fragment {
                             Button addRemoveButton = (Button) v;
                             if (addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
                                 addRemoveButton.setText("Remove");
+
+                                addNewFriend(otherUid);
+
+
                             } else {
                                 addRemoveButton.setText("Add");
+
+                                removeFriend(otherUid);
                             }
                         }
                     });
@@ -195,5 +202,4 @@ public class FriendsFragment extends Fragment {
     public void removeFriend(String friendUID) {
         
     }
-
 }
