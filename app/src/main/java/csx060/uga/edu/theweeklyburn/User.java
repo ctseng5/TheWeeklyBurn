@@ -8,15 +8,20 @@ public class User {
     public String phoneNumber;
     public String uid;
 
-    public User(){
-        this.uid = "";
-    }
-
-    public User(String firstName, String lastName, String email, String phoneNumber) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String uid) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.uid = uid;
+    }
+
+    public User () {
+        firstName = "";
+        lastName = "";
+        email = "";
+        phoneNumber = "";
+        uid = "";
     }
 
     public User(String uid){
