@@ -101,44 +101,7 @@ public class FriendsFragment extends Fragment {
                 .setQuery(userDatabase, User.class)
                 .build();
 
-
-        adapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options){
-            @Override
-            protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
-                String fullName = users.getFirstName() + " " + users.getLastName();
-
-                UserViewHolder viewHolder = holder;
-                viewHolder.setUserName(fullName);
-                viewHolder.setUserPhone(users.getPhoneNumber());
-                viewHolder.setUserImage(R.drawable.icon);
-
-                if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
-                    viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Button addRemoveButton = (Button) v;
-                            if (addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
-                                addRemoveButton.setText("Remove");
-                            } else {
-                                addRemoveButton.setText("Add");
-                            }
-                        }
-                    });
-                }
-                else{
-                    viewHolder.addRemoveButton.setVisibility(View.GONE);
-                }
-            }
-
-            @NonNull
-            @Override
-            public UserViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                View userView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_user_single, viewGroup, false);
-
-                return new UserViewHolder(userView);
-            }
-        };
-
+        adapter = createAdapter(options);
         userList.setAdapter(adapter);
         adapter.startListening();
     }
@@ -150,7 +113,13 @@ public class FriendsFragment extends Fragment {
                 .setQuery(firebaseSearchQuery, User.class)
                 .build();
 
-        adapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options){
+        adapter = createAdapter(options);
+        userList.setAdapter(adapter);
+        adapter.startListening();
+    }
+
+    public FirebaseRecyclerAdapter<User, UserViewHolder> createAdapter(FirebaseRecyclerOptions<User> options){
+        FirebaseRecyclerAdapter<User, UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options){
             @Override
             protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
                 String fullName = users.getFirstName() + " " + users.getLastName();
@@ -186,9 +155,7 @@ public class FriendsFragment extends Fragment {
                 return new UserViewHolder(userView);
             }
         };
-
-        userList.setAdapter(adapter);
-        adapter.startListening();
+        return createdadapter;
     }
 
     public class UserViewHolder extends RecyclerView.ViewHolder{
