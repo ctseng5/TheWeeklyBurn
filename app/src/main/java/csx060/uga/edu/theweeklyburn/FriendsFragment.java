@@ -136,7 +136,6 @@ public class FriendsFragment extends Fragment {
                             Button addRemoveButton = (Button) v;
                             if (addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
                                 addRemoveButton.setText("Remove");
-                                System.out.println(FirebaseAuth.getInstance());
                             } else {
                                 addRemoveButton.setText("Add");
                             }
