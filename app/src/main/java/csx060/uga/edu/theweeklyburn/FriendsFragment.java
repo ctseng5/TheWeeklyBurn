@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
@@ -47,6 +48,7 @@ public class FriendsFragment extends Fragment {
     private FirebaseRecyclerAdapter<User, UserViewHolder> adapter;
     private SearchView searchView;
     private String currentUserEmail;
+    private String selectedFriendUID = "";
 
     DatabaseReference RelationRef = database.getReference("Relationships");
 
@@ -65,7 +67,6 @@ public class FriendsFragment extends Fragment {
         }
 
         userDatabase = database.getReference().child("Information").child("users");
-        relationshipDatabase = RelationRef.child("users");
 
         userList = (RecyclerView) view.findViewById(R.id.userList);
         userList.setHasFixedSize(true);
@@ -130,10 +131,31 @@ public class FriendsFragment extends Fragment {
             protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
                 final String fullName = users.getFirstName() + " " + users.getLastName();
                 final String otherUid = users.getUid();
-                UserViewHolder viewHolder = holder;
+                final UserViewHolder viewHolder = holder;
                 viewHolder.setUserName(fullName);
                 viewHolder.setUserPhone(users.getPhoneNumber());
                 viewHolder.setUserImage(R.drawable.icon);
+
+                RelationRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()) {
+                            selectedFriendUID = dataSnapshot.getValue().toString();
+                            selectedFriendUID = selectedFriendUID.substring(1, selectedFriendUID.indexOf('='));
+
+                            System.out.println(selectedFriendUID);
+                            if (otherUid.equalsIgnoreCase(selectedFriendUID)) {
+                                String addRemoveText = "Remove";
+                                viewHolder.addRemoveButton.setText(addRemoveText);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
 
                 if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
                     viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
@@ -144,8 +166,6 @@ public class FriendsFragment extends Fragment {
                                 addRemoveButton.setText("Remove");
 
                                 addNewFriend(fullName, otherUid);
-
-
                             } else {
                                 addRemoveButton.setText("Add");
 
