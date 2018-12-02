@@ -22,9 +22,12 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
@@ -42,6 +45,7 @@ public class FriendsFragment extends Fragment {
     private FirebaseRecyclerAdapter<User, UserViewHolder> adapter;
     private SearchView searchView;
     private String currentUserEmail;
+    private String currentStatus = "";
 
     DatabaseReference RelationRef = database.getReference("Relationships");
 
@@ -60,7 +64,6 @@ public class FriendsFragment extends Fragment {
         }
 
         userDatabase = database.getReference().child("Information").child("users");
-        relationshipDatabase = RelationRef.child("users");
 
         userList = (RecyclerView) view.findViewById(R.id.userList);
         userList.setHasFixedSize(true);
@@ -130,6 +133,28 @@ public class FriendsFragment extends Fragment {
                 viewHolder.setUserPhone(users.getPhoneNumber());
                 viewHolder.setUserImage(R.drawable.icon);
 
+                RelationRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Relationships currentRelationships = dataSnapshot.getValue(Relationships.class);
+                        if(currentRelationships != null)
+                            currentStatus = currentRelationships.getRelationship();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                System.out.println(currentStatus.toString() + " Fuck");
+                System.out.println(currentStatus.equals("friend") + " Answer");
+
+                if(RelationRef.child(auth.getUid()).child(otherUid).child("relationship").toString().equalsIgnoreCase("friend")){
+                    String addRemoveText = "Remove";
+                    viewHolder.setAddRemoveText(addRemoveText);
+                }
+
                 if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
                     viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
                         @Override
@@ -192,6 +217,10 @@ public class FriendsFragment extends Fragment {
 
         public void setUserImage(int image){
             userImage.setImageResource(image);
+        }
+
+        public void setAddRemoveText(String addRemoveStatus){
+            addRemoveButton.setText(addRemoveStatus);
         }
     }
 
