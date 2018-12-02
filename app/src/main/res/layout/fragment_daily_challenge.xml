@@ -9,68 +9,148 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <TextView
-        android:id="@+id/friendSummary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="44dp"
-        android:layout_marginRight="44dp"
-        android:text="sec"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity2" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="267dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/submitWorkout"
+        app:layout_constraintTop_toBottomOf="@+id/countdown">
 
-    <EditText
-        android:id="@+id/quant4"
-        android:layout_width="75dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="75dp"
-        android:ems="10"
-        android:hint="Reps"
-        android:inputType="number"
-        android:textSize="30sp"
-        android:gravity="right"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity4" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/activity4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginRight="48dp"
-        android:text="activity4"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/quant2" />
+            <EditText
+                android:id="@+id/quant3"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="75dp"
+                android:layout_marginTop="12dp"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="Reps"
+                android:inputType="number"
+                android:textSize="30sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/activity3" />
 
-    <TextView
-        android:id="@+id/activity3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="48dp"
-        android:layout_marginTop="40dp"
-        android:text="activity3"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textSize="30sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/quant1" />
+            <TextView
+                android:id="@+id/activity2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="48dp"
+                android:layout_marginRight="48dp"
+                android:text="activity2"
+                android:textColor="@color/common_google_signin_btn_text_dark_default"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/countdown" />
 
-    <TextView
-        android:id="@+id/activity2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="48dp"
-        android:layout_marginRight="48dp"
-        android:text="activity2"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/countdown" />
+            <EditText
+                android:id="@+id/quant4"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="75dp"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="Reps"
+                android:inputType="number"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/activity4" />
+
+            <TextView
+                android:id="@+id/activity4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginRight="48dp"
+                android:text="activity4"
+                android:textColor="@color/common_google_signin_btn_text_dark_default"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/quant2" />
+
+            <TextView
+                android:id="@+id/activity1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="48dp"
+                android:layout_marginTop="40dp"
+                android:text="activity1"
+                android:textColor="@color/common_google_signin_btn_text_dark_default"
+                android:textSize="30sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/countdown" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="30dp"
+                android:text="miles"
+                android:textSize="24sp"
+                app:layout_constraintStart_toEndOf="@+id/quant1"
+                app:layout_constraintTop_toBottomOf="@+id/activity1" />
+
+            <TextView
+                android:id="@+id/activity3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="48dp"
+                android:layout_marginTop="40dp"
+                android:text="activity3"
+                android:textColor="@color/common_google_signin_btn_text_dark_default"
+                android:textSize="30sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/quant1" />
+
+            <TextView
+                android:id="@+id/friendSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="44dp"
+                android:layout_marginRight="44dp"
+                android:text="sec"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/activity2" />
+
+            <EditText
+                android:id="@+id/quant1"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginTop="12dp"
+                android:ems="10"
+                android:gravity="right"
+                android:inputType="numberDecimal"
+                android:textSize="30sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/activity1" />
+
+            <EditText
+                android:id="@+id/quant2"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginRight="2dp"
+                android:ems="10"
+                android:gravity="right"
+                android:inputType="time"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toStartOf="@+id/friendSummary"
+                app:layout_constraintTop_toBottomOf="@+id/activity2" />
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
 
     <TextView
         android:id="@+id/day"
@@ -85,84 +165,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/activity1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="48dp"
-        android:layout_marginTop="40dp"
-        android:text="activity1"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textSize="30sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/countdown" />
-
-    <EditText
-        android:id="@+id/quant1"
-        android:layout_width="75dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginLeft="48dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:inputType="numberDecimal"
-        android:textSize="30sp"
-        android:gravity="right"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity1" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="30dp"
-        android:text="miles"
-        android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@+id/quant1"
-        app:layout_constraintTop_toBottomOf="@+id/activity1" />
-
-    <EditText
-        android:id="@+id/quant2"
-        android:layout_width="90dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp"
-        android:ems="10"
-        android:gravity="right"
-        android:inputType="time"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toStartOf="@+id/friendSummary"
-        app:layout_constraintTop_toBottomOf="@+id/activity2" />
-
-    <EditText
-        android:id="@+id/quant3"
-        android:layout_width="75dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="75dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:hint="Reps"
-        android:inputType="number"
-        android:textSize="30sp"
-        android:gravity="right"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity3" />
-
     <Button
         android:id="@+id/submitWorkout"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="93dp"
+        android:layout_marginBottom="76dp"
         android:background="@color/colorPrimary"
         android:enabled="false"
         android:text="Submit"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
