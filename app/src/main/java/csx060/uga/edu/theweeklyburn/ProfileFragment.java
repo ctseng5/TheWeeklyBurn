@@ -42,13 +42,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private String name = "";
     private String email = "";
     private String phone = "";
+    private User friend;
 
     private RecyclerView friendsList;
     private RecyclerView badgeList;
     private DatabaseReference friendsDatabase;
     private DatabaseReference badgeDatabase;
-    private FirebaseRecyclerOptions<User> optionsFriends;
-    private FirebaseRecyclerAdapter<User, ProfileFragment.UserViewHolder> adapter;
+    private FirebaseRecyclerOptions<Relationships> optionsFriends;
+    private FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> adapter;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Information");
@@ -92,8 +93,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onStart(){
         super.onStart();
 
-        optionsFriends = new FirebaseRecyclerOptions.Builder<User>()
-                .setQuery(friendsDatabase, User.class)
+        optionsFriends = new FirebaseRecyclerOptions.Builder<Relationships>()
+                .setQuery(friendsDatabase, Relationships.class)
                 .build();
 
         adapter = createAdapterFriends(optionsFriends);
@@ -101,14 +102,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         adapter.startListening();
     }
 
-    public FirebaseRecyclerAdapter<User, ProfileFragment.UserViewHolder> createAdapterFriends(FirebaseRecyclerOptions<User> options){
-        FirebaseRecyclerAdapter<User, ProfileFragment.UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<User, ProfileFragment.UserViewHolder>(options){
+    public FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createAdapterFriends(FirebaseRecyclerOptions<Relationships> optionsFriends){
+        FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder>(optionsFriends){
             @Override
-            protected void onBindViewHolder(@NonNull ProfileFragment.UserViewHolder holder, int position, @NonNull User friends) {
-                final String otherUid = friends.getUid();
+            protected void onBindViewHolder(@NonNull ProfileFragment.UserViewHolder holder, int position, @NonNull Relationships friendsList) {
+                final String otherUid = friendsList.getUid();
+                System.out.println("other UID: " + otherUid);
+                Toast.makeText(getActivity(), "other UID: " + otherUid, Toast.LENGTH_LONG).show();
                 ProfileFragment.UserViewHolder viewHolder = holder;
-                viewHolder.setFirstName(friends.getFirstName());
-                viewHolder.setLastName(friends.getLastName());
+                //DatabaseReference friendRef = ref.child("user").child(otherUid);
+
+//                User friend = getFriendInfo(otherUid);
+//                viewHolder.setFirstName(friend.getFirstName());
+//                viewHolder.setLastName(friend.getLastName());
 
                 viewHolder.viewProfile.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -201,6 +207,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 //        public void setUserImage(int image){
 //            userImage.setImageResource(image);
 //        }
+    }
+
+    public User getFriendInfo(String friendUid) {
+        DatabaseReference userRef = ref.child("users").child(friendUid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                friend = dataSnapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        return friend;
     }
 
 }
