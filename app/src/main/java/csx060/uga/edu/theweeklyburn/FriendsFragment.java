@@ -140,13 +140,14 @@ public class FriendsFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()) {
-                            selectedFriendUID = dataSnapshot.getValue().toString();
-                            selectedFriendUID = selectedFriendUID.substring(1, selectedFriendUID.indexOf('='));
+                            for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                selectedFriendUID = snapshot.getKey().toString();
 
-                            System.out.println(selectedFriendUID);
-                            if (otherUid.equalsIgnoreCase(selectedFriendUID)) {
-                                String addRemoveText = "Remove";
-                                viewHolder.addRemoveButton.setText(addRemoveText);
+                                if (otherUid.equalsIgnoreCase(selectedFriendUID)) {
+                                    String addRemoveText = "Remove";
+                                    viewHolder.addRemoveButton.setText(addRemoveText);
+
+                                }
                             }
                         }
                     }
