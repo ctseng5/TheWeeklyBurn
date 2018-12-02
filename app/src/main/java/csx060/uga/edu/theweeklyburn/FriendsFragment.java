@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,12 +17,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -123,7 +128,7 @@ public class FriendsFragment extends Fragment {
         FirebaseRecyclerAdapter<User, UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options){
             @Override
             protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
-                String fullName = users.getFirstName() + " " + users.getLastName();
+                final String fullName = users.getFirstName() + " " + users.getLastName();
                 final String otherUid = users.getUid();
                 UserViewHolder viewHolder = holder;
                 viewHolder.setUserName(fullName);
@@ -138,13 +143,13 @@ public class FriendsFragment extends Fragment {
                             if (addRemoveButton.getText().toString().equalsIgnoreCase("add")) {
                                 addRemoveButton.setText("Remove");
 
-                                addNewFriend(otherUid);
+                                addNewFriend(fullName, otherUid);
 
 
                             } else {
                                 addRemoveButton.setText("Add");
 
-                                removeFriend(otherUid);
+                                removeFriend(fullName, otherUid);
                             }
                         }
                     });
@@ -195,12 +200,16 @@ public class FriendsFragment extends Fragment {
         }
     }
 
-    public void addNewFriend(String friendUID) {
+    public void addNewFriend(String friendName, String friendUID) {
         RelationRef.child(auth.getUid()).child(friendUID).setValue(new Relationships("friend"));
+        RelationRef.child(friendUID).child(auth.getUid()).setValue(new Relationships("friend"));
+        Toast.makeText(getActivity(), friendName + " was added as your friend", Toast.LENGTH_LONG).show();
     }
 
-    public void removeFriend(String friendUID) {
-        
+    public void removeFriend(String friendName, String friendUID) {
+        RelationRef.child(auth.getUid()).child(friendUID).removeValue();
+        RelationRef.child(friendUID).child(auth.getUid()).removeValue();
+        Toast.makeText(getActivity(), friendName + " was removed as your friend", Toast.LENGTH_LONG).show();
     }
-    
+
 }
