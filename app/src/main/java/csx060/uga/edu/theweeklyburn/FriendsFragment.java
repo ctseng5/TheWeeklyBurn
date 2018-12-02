@@ -1,4 +1,4 @@
-spackage csx060.uga.edu.theweeklyburn;
+package csx060.uga.edu.theweeklyburn;
 
 
 import android.graphics.drawable.Drawable;
@@ -48,7 +48,7 @@ public class FriendsFragment extends Fragment {
     private FirebaseRecyclerAdapter<User, UserViewHolder> adapter;
     private SearchView searchView;
     private String currentUserEmail;
-    private String currentStatus = "";
+    private String selectedFriendUID = "";
 
     DatabaseReference RelationRef = database.getReference("Relationships");
 
@@ -131,7 +131,7 @@ public class FriendsFragment extends Fragment {
             protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull User users) {
                 final String fullName = users.getFirstName() + " " + users.getLastName();
                 final String otherUid = users.getUid();
-                UserViewHolder viewHolder = holder;
+                final UserViewHolder viewHolder = holder;
                 viewHolder.setUserName(fullName);
                 viewHolder.setUserPhone(users.getPhoneNumber());
                 viewHolder.setUserImage(R.drawable.icon);
@@ -139,9 +139,16 @@ public class FriendsFragment extends Fragment {
                 RelationRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Relationships currentRelationships = dataSnapshot.getValue(Relationships.class);
-                        if(currentRelationships != null)
-                            currentStatus = currentRelationships.getRelationship();
+                        if(dataSnapshot.exists()) {
+                            selectedFriendUID = dataSnapshot.getValue().toString();
+                            selectedFriendUID = selectedFriendUID.substring(1, selectedFriendUID.indexOf('='));
+
+                            System.out.println(selectedFriendUID);
+                            if (otherUid.equalsIgnoreCase(selectedFriendUID)) {
+                                String addRemoveText = "Remove";
+                                viewHolder.addRemoveButton.setText(addRemoveText);
+                            }
+                        }
                     }
 
                     @Override
@@ -149,14 +156,6 @@ public class FriendsFragment extends Fragment {
 
                     }
                 });
-
-                System.out.println(currentStatus.toString() + " Fuck");
-                System.out.println(currentStatus.equals("friend") + " Answer");
-
-                if(RelationRef.child(auth.getUid()).child(otherUid).child("relationship").toString().equalsIgnoreCase("friend")){
-                    String addRemoveText = "Remove";
-                    viewHolder.setAddRemoveText(addRemoveText);
-                }
 
                 if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
                     viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
@@ -167,8 +166,6 @@ public class FriendsFragment extends Fragment {
                                 addRemoveButton.setText("Remove");
 
                                 addNewFriend(fullName, otherUid);
-
-
                             } else {
                                 addRemoveButton.setText("Add");
 
@@ -220,10 +217,6 @@ public class FriendsFragment extends Fragment {
 
         public void setUserImage(int image){
             userImage.setImageResource(image);
-        }
-
-        public void setAddRemoveText(String addRemoveStatus){
-            addRemoveButton.setText(addRemoveStatus);
         }
     }
 
