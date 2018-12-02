@@ -223,7 +223,7 @@ public class FriendsFragment extends Fragment {
 
     public void addNewFriend(String friendName, String friendUID) {
         RelationRef.child(auth.getUid()).child(friendUID).setValue(new Relationships("friend", friendUID));
-        RelationRef.child(friendUID).child(auth.getUid()).setValue(new Relationships("friend", friendUID));
+        RelationRef.child(friendUID).child(auth.getUid()).setValue(new Relationships("friend", auth.getUid()));
         Toast.makeText(getActivity(), friendName + " was added as your friend", Toast.LENGTH_LONG).show();
     }
 
