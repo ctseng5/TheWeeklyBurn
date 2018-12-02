@@ -108,13 +108,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             protected void onBindViewHolder(@NonNull ProfileFragment.UserViewHolder holder, int position, @NonNull Relationships friendsList) {
                 final String otherUid = friendsList.getUid();
                 System.out.println("other UID: " + otherUid);
-                Toast.makeText(getActivity(), "other UID: " + otherUid, Toast.LENGTH_LONG).show();
+
                 ProfileFragment.UserViewHolder viewHolder = holder;
                 //DatabaseReference friendRef = ref.child("user").child(otherUid);
 
-//                User friend = getFriendInfo(otherUid);
-//                viewHolder.setFirstName(friend.getFirstName());
-//                viewHolder.setLastName(friend.getLastName());
+                User friend = getFriendInfo(otherUid, viewHolder);
+//                Toast.makeText(getActivity(), "fName: " + friend.getFirstName(), Toast.LENGTH_LONG).show();
 
                 viewHolder.viewProfile.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -209,12 +208,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 //        }
     }
 
-    public User getFriendInfo(String friendUid) {
+    public User getFriendInfo(String friendUid, final ProfileFragment.UserViewHolder viewHolder) {
         DatabaseReference userRef = ref.child("users").child(friendUid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 friend = dataSnapshot.getValue(User.class);
+                viewHolder.setFirstName(friend.getFirstName());
+                viewHolder.setLastName(friend.getLastName());
             }
 
             @Override
