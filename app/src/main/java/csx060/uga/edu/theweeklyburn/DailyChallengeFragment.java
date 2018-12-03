@@ -64,7 +64,7 @@ public class DailyChallengeFragment extends Fragment {
     int day;
 
     boolean tieInNumbers = false;
-
+    private long workoutReps;
     private FirebaseAuth auth;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Workouts");
@@ -129,8 +129,8 @@ public class DailyChallengeFragment extends Fragment {
             e.printStackTrace();
         }
         //For purposes of the demo, new date will be set to 5 minutes later:
-        MyCount counter = new MyCount(10000, 1000);
-//        MyCount counter = new MyCount(diff, 1000);
+//        MyCount counter = new MyCount(15000, 1000);
+        MyCount counter = new MyCount(diff, 1000);
         counter.start();
 
         day = calendar.get(Calendar.DAY_OF_WEEK);
@@ -217,7 +217,7 @@ public class DailyChallengeFragment extends Fragment {
 
         @Override
         public void onFinish() {
-            //assignBadges();
+//            assignBadges();
             getActivity().recreate();
             Toast.makeText(getActivity(), "It's a new day with a new Daily Challenge!", Toast.LENGTH_LONG).show();
 
@@ -387,102 +387,74 @@ public class DailyChallengeFragment extends Fragment {
         quant4.setText("");
     }
 
-    public void assignBadges() {
-        final ArrayList<String> friendsList = new ArrayList<String>();
-        final ArrayList<Workout> finalWorkoutNumbers = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance();
-        friendRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        friendsList.add(snapshot.getKey().toString());
-                    }
-                }
-                //Toast.makeText(getActivity(), "Friend 1: " + friendsList.get(friendsList.size()-1), Toast.LENGTH_LONG).show();
-                Log.d("FUCK", "Last friend = " + friendsList.size());
-            }
+//    public void assignBadges() {
+//        final Calendar calendar = Calendar.getInstance();
+//        final int year = calendar.get(Calendar.YEAR);
+//        final int week = calendar.get(Calendar.WEEK_OF_YEAR);
+//
+//        ref.child("Year" + calendar.get(Calendar.YEAR) +
+//                "Week" + calendar.get(Calendar.WEEK_OF_YEAR)).addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        if(dataSnapshot.exists()){
+//                            for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
+//                            }
+//                        }
+//                    }
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//                    }
+//                });
+//    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        friendsList.add(auth.getUid());
-        Log.d("FUCK","friendsSize: " + friendsList.size());
-        for(int i=0; i<friendsList.size();i++) {
-            Log.d("FUCK","friendsList " + i + ": " + friendsList.get(i));
-            ref.child("Year" + calendar.get(Calendar.YEAR) +
-                    "Week" + calendar.get(Calendar.WEEK_OF_YEAR)).child(friendsList.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Workout friendWorkout = dataSnapshot.getValue(Workout.class);
-
-                    finalWorkoutNumbers.add(friendWorkout);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-        }
-        //String jumpingJacksWinner = friendsList.get(compareJumpingJacks(finalWorkoutNumbers));
-        //String runWinner = friendsList.get(compareRun(finalWorkoutNumbers));
-        int runWinner = compareRun(finalWorkoutNumbers);
-        Log.d("FUCK", "winner = " + runWinner);
-        //Toast.makeText(getActivity(), "Run Winner is: " + runWinner, Toast.LENGTH_LONG).show();
-    }
-
-    public int compareJumpingJacks(ArrayList<Workout> workoutNumbers) {
-        int arrayOfNumbers[] = null;
-        int count = 0;
-        for (int i=0; i<workoutNumbers.size(); i++) {
-            arrayOfNumbers[i] = workoutNumbers.get(i).getJumpingJacks();
-        }
-        int maxIndex = 0;
-        for(int j=1; j<arrayOfNumbers.length; j++) {
-            if(arrayOfNumbers[j] > arrayOfNumbers[maxIndex]) {
-                maxIndex = j;
-            }
-        }
-        for(int k=0; k<arrayOfNumbers.length;k++) {
-            if (arrayOfNumbers[k] == arrayOfNumbers[maxIndex]) {
-                count++;
-                if(count > 1) {
-                    tieInNumbers = true;
-                    break;
-                }
-            }
-        }
-        return maxIndex;
-    }
-
-    public int compareRun(ArrayList<Workout> workoutNumbers) {
-        ArrayList<Float> arrayOfNumbers = new ArrayList<>();
-        int count = 0;
-        Log.d("FUCK", "size of workoutnumbers arraylist = " + workoutNumbers.size());
-        for (int i=0; i<workoutNumbers.size(); i++) {
-            arrayOfNumbers.add(workoutNumbers.get(i).getRun());
-            Log.d("FUCK", "Run: " + workoutNumbers.get(i).getRun());
-        }
-        int maxIndex = 0;
-        for(int j=1; j<arrayOfNumbers.size(); j++) {
-            if(arrayOfNumbers.get(j) > arrayOfNumbers.get(maxIndex)) {
-                maxIndex = j;
-            }
-        }
-        for(int k=0; k<arrayOfNumbers.size();k++) {
-            if (arrayOfNumbers.get(k) == arrayOfNumbers.get(maxIndex)) {
-                count++;
-                if(count > 1) {
-                    tieInNumbers = true;
-                    break;
-                }
-            }
-        }
-        return maxIndex;
-    }
+//    public int compareJumpingJacks(ArrayList<Workout> workoutNumbers) {
+//        int arrayOfNumbers[] = null;
+//        int count = 0;
+//        for (int i=0; i<workoutNumbers.size(); i++) {
+//            arrayOfNumbers[i] = workoutNumbers.get(i).getJumpingJacks();
+//        }
+//        int maxIndex = 0;
+//        for(int j=1; j<arrayOfNumbers.length; j++) {
+//            if(arrayOfNumbers[j] > arrayOfNumbers[maxIndex]) {
+//                maxIndex = j;
+//            }
+//        }
+//        for(int k=0; k<arrayOfNumbers.length;k++) {
+//            if (arrayOfNumbers[k] == arrayOfNumbers[maxIndex]) {
+//                count++;
+//                if(count > 1) {
+//                    tieInNumbers = true;
+//                    break;
+//                }
+//            }
+//        }
+//        return maxIndex;
+//    }
+//
+//    public int compareRun(ArrayList<Workout> workoutNumbers) {
+//        ArrayList<Float> arrayOfNumbers = new ArrayList<>();
+//        int count = 0;
+//        Log.d("FUCK", "size of workoutnumbers arraylist = " + workoutNumbers.size());
+//        for (int i=0; i<workoutNumbers.size(); i++) {
+//            arrayOfNumbers.add(workoutNumbers.get(i).getRun());
+//            Log.d("FUCK", "Run: " + workoutNumbers.get(i).getRun());
+//        }
+//        int maxIndex = 0;
+//        for(int j=1; j<arrayOfNumbers.size(); j++) {
+//            if(arrayOfNumbers.get(j) > arrayOfNumbers.get(maxIndex)) {
+//                maxIndex = j;
+//            }
+//        }
+//        for(int k=0; k<arrayOfNumbers.size();k++) {
+//            if (arrayOfNumbers.get(k) == arrayOfNumbers.get(maxIndex)) {
+//                count++;
+//                if(count > 1) {
+//                    tieInNumbers = true;
+//                    break;
+//                }
+//            }
+//        }
+//        return maxIndex;
+//    }
 
 }
