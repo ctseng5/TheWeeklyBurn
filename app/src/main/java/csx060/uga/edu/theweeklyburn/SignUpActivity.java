@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Random;
+
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -100,6 +102,7 @@ public class SignUpActivity extends AppCompatActivity {
             final String fname = firstName.getText().toString().trim();
             final String lname = lastName.getText().toString().trim();
             final String phone = phoneNum.getText().toString().trim();
+            final int randNum = new Random().nextInt(10);
 
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
@@ -147,7 +150,7 @@ public class SignUpActivity extends AppCompatActivity {
                     }
                     else {
                         DatabaseReference usersRef = ref.child("users");
-                        usersRef.child(auth.getUid()).setValue(new User(fname, lname, email, phone, auth.getUid()));
+                        usersRef.child(auth.getUid()).setValue(new User(fname, lname, email, phone, auth.getUid(), randNum));
                         startActivity(new Intent(SignUpActivity.this, MainActivity.class));
                         finish();
                     }

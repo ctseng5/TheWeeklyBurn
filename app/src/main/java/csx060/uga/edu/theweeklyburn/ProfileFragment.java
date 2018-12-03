@@ -37,6 +37,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextView userEmail;
     private TextView userPhone;
     private Button signOutButton;
+    private ImageView userImage;
     private FirebaseAuth auth;
 
     private String name = "";
@@ -82,6 +83,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         userName = view.findViewById(R.id.userName);
         userEmail = view.findViewById(R.id.userEmail);
         userPhone = view.findViewById(R.id.userPhone);
+        userImage = view.findViewById(R.id.imageView2);
 
         signOutButton = view.findViewById(R.id.signOutButton);
         signOutButton.setOnClickListener(this);
@@ -115,16 +117,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 User friend = getFriendInfo(otherUid, viewHolder);
 //                Toast.makeText(getActivity(), "fName: " + friend.getFirstName(), Toast.LENGTH_LONG).show();
 
-                viewHolder.viewProfile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Button viewProfile = (Button) v;
-                        if (viewProfile.getText().toString().equalsIgnoreCase("add")) {
-
-
-                        }
-                    }
-                });
+//                viewHolder.viewProfile.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Button viewProfile = (Button) v;
+//                        if (viewProfile.getText().toString().equalsIgnoreCase("add")) {
+//
+//
+//                        }
+//                    }
+//                });
             }
 
             @NonNull
@@ -155,16 +157,49 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
+                String profileImage = "";
+
                 //Workout prevWorkout = dataSnapshot.getValue(Workout.class);
                 if(user != null) {
                     name = user.getFirstName() + " " + user.getLastName();
                     email = user.getEmail();
                     phone = user.getPhoneNumber();
+
+                    switch(user.getProfilePicNum()){
+                        case 0:
+                            profileImage = "pro_pic_1";
+                            break;
+                        case 1:
+                            profileImage = "pro_pic_2";
+                            break;
+                        case 2:
+                            profileImage = "pro_pic_3";
+                            break;
+                        case 3:
+                            profileImage = "pro_pic_4";
+                            break;
+                        case 4:
+                            profileImage = "pro_pic_5";
+                            break;
+                        case 5:
+                            profileImage = "pro_pic_6";
+                            break;
+                        case 6:
+                            profileImage = "pro_pic_7";
+                            break;
+                        case 7:
+                            profileImage = "pro_pic_8";
+                            break;
+                        case 8:
+                            profileImage = "pro_pic_9";
+                            break;
+                    }
                 }
 
                 userName.setText(name);
-                userEmail.setText(email);
-                userPhone.setText(phone);
+                userEmail.setText("Email: " + email);
+                userPhone.setText("Phone: " + phone);
+                userImage.setImageResource(getResources().getIdentifier(profileImage, "drawable", getContext().getPackageName()));
                 //Toast.makeText(getActivity(), prevPlank, Toast.LENGTH_LONG).show();
             }
 
@@ -177,35 +212,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     public class UserViewHolder extends RecyclerView.ViewHolder{
         TextView friendFname;
-        TextView friendLname;
-//        ImageView userImage;
-        Button viewProfile;
+        ImageView friendImage;
+//        Button viewProfile;
 
         public UserViewHolder(View itemView){
             super(itemView);
 
             friendFname = itemView.findViewById(R.id.friendFname);
-            friendLname = itemView.findViewById(R.id.friendLname);
-//            userImage = itemView.findViewById(R.id.imageView);
-            viewProfile = itemView.findViewById(R.id.viewProfile);
+            friendImage = itemView.findViewById(R.id.imageView3);
+//            viewProfile = itemView.findViewById(R.id.viewProfile);
         }
 
-        public void setFirstName(String firstName){
-            friendFname.setText(firstName);
+        public void setFriendName(String fullName){
+            friendFname.setText(fullName);
         }
 
-        public void setLastName(String lastName){
-            friendLname.setText(lastName);
+        public void setFriendImage(int image){
+            friendImage.setImageResource(image);
         }
-
-//        public void setUserPhone(String phone){
-//            String phoneText = "Phone: " + phone;
-//            userPhone.setText(phoneText);
-//        }
-//
-//        public void setUserImage(int image){
-//            userImage.setImageResource(image);
-//        }
     }
 
     public User getFriendInfo(String friendUid, final ProfileFragment.UserViewHolder viewHolder) {
@@ -214,8 +238,41 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 friend = dataSnapshot.getValue(User.class);
-                viewHolder.setFirstName(friend.getFirstName());
-                viewHolder.setLastName(friend.getLastName());
+                String profileFriendimage = "";
+                String fullName = friend.getFirstName() + " " + friend.getLastName();
+
+                switch(friend.getProfilePicNum()){
+                    case 0:
+                        profileFriendimage = "pro_pic_1";
+                        break;
+                    case 1:
+                        profileFriendimage = "pro_pic_2";
+                        break;
+                    case 2:
+                        profileFriendimage = "pro_pic_3";
+                        break;
+                    case 3:
+                        profileFriendimage = "pro_pic_4";
+                        break;
+                    case 4:
+                        profileFriendimage = "pro_pic_5";
+                        break;
+                    case 5:
+                        profileFriendimage = "pro_pic_6";
+                        break;
+                    case 6:
+                        profileFriendimage = "pro_pic_7";
+                        break;
+                    case 7:
+                        profileFriendimage = "pro_pic_8";
+                        break;
+                    case 8:
+                        profileFriendimage = "pro_pic_9";
+                        break;
+                }
+
+                viewHolder.setFriendName(fullName);
+                viewHolder.setFriendImage(getResources().getIdentifier(profileFriendimage, "drawable", getContext().getPackageName()));
             }
 
             @Override
