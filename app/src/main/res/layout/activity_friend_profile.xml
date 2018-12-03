@@ -42,7 +42,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/friendsList"
-                android:layout_width="655dp"
+                android:layout_width="395dp"
                 android:layout_height="100dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -72,7 +72,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/badgeList"
-                android:layout_width="655dp"
+                android:layout_width="395dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"

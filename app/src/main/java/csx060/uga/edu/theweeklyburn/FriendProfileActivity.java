@@ -1,3 +1,9 @@
+/**
+ * FriendProfile Activity
+ * @authors: Jeffrey Kao & Michael Tseng
+ * The activity that shows a user's friend
+ */
+
 package csx060.uga.edu.theweeklyburn;
 
 import android.content.Intent;
@@ -23,8 +29,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+/**
+ * Creates the FriendProfileActivity
+ */
 public class FriendProfileActivity extends AppCompatActivity {
 
+    //Initialize global variables
     private TextView userName;
     private TextView userEmail;
     private TextView userPhone;
@@ -50,6 +60,10 @@ public class FriendProfileActivity extends AppCompatActivity {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Information");
 
+    /**
+     * Creates the views
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +94,9 @@ public class FriendProfileActivity extends AppCompatActivity {
         userImage = findViewById(R.id.imageView2);
     }
 
+    /**
+     * Sets the adapters
+     */
     @Override
     public void onStart(){
         super.onStart();
@@ -93,6 +110,11 @@ public class FriendProfileActivity extends AppCompatActivity {
         adapter.startListening();
     }
 
+    /**
+     * Creates a FirebaseRecyclerAdapter to hold friends list
+     * @param optionsFriends
+     * @return
+     */
     public FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createAdapterFriends(FirebaseRecyclerOptions<Relationships> optionsFriends){
         FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder>(optionsFriends){
             @Override
@@ -117,6 +139,10 @@ public class FriendProfileActivity extends AppCompatActivity {
         return createdadapter;
     }
 
+    /**
+     * Fetches the user info from the DB
+     * @param userRef
+     */
     public void getUserInfo(DatabaseReference userRef) {
         userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -130,6 +156,7 @@ public class FriendProfileActivity extends AppCompatActivity {
                     email = user.getEmail();
                     phone = user.getPhoneNumber();
 
+                    //Sets the profile pic of the friend
                     switch(user.getProfilePicNum()){
                         case 0:
                             profileImage = "pro_pic_1";
@@ -174,6 +201,9 @@ public class FriendProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates UserViewHolder
+     */
     public class UserViewHolder extends RecyclerView.ViewHolder{
         TextView friendFname;
         ImageView friendImage;
@@ -194,6 +224,12 @@ public class FriendProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets the friend's info from the DB
+     * @param friendUid
+     * @param viewHolder
+     * @return
+     */
     public User getFriendInfo(String friendUid, final ProfileFragment.UserViewHolder viewHolder) {
         DatabaseReference userRef = ref.child("users").child(friendUid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
