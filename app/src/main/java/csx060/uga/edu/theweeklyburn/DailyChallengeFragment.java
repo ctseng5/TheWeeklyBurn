@@ -48,28 +48,58 @@ public class DailyChallengeFragment extends Fragment {
     private Button submit;
     private TextView countdown;
 
-    float prevRun = 0;
-    int prevPlank = 0;
-    int prevPushups = 0;
-    int prevPullups = 0;
-    int prevSitups = 0;
-    int prevSquats = 0;
-    int prevTricepDips = 0;
-    int prevJumpingJacks = 0;
-    int prevLunges = 0;
+    private float prevRun = 0;
+    private int prevPlank = 0;
+    private int prevPushups = 0;
+    private int prevPullups = 0;
+    private int prevSitups = 0;
+    private int prevSquats = 0;
+    private int prevTricepDips = 0;
+    private int prevJumpingJacks = 0;
+    private int prevLunges = 0;
 
-    long diff;
-    long oldLong;
-    long newLong;
-    int day;
+    private int prevRunBadges = 0;
+    private int prevPlankBadges = 0;
+    private int prevPushupBadges = 0;
+    private int prevPullupBadges = 0;
+    private int prevSitupBadges = 0;
+    private int prevSquatBadges = 0;
+    private int prevTricepBadges = 0;
+    private int prevJumpingBadges = 0;
+    private int prevLungeBadges = 0;
 
-    boolean tieInNumbers = false;
+    private float totalRun = 0;
+    private int totalPlank = 0;
+    private int totalPushups = 0;
+    private int totalPullups = 0;
+    private int totalSitups = 0;
+    private int totalSquats = 0;
+    private int totalTricepDips = 0;
+    private int totalJumpingJacks = 0;
+    private int totalLunges = 0;
+
+    private long diff;
+    private long oldLong;
+    private long newLong;
+    private int day;
+
+    private final int MAX_RUN_CONSTANT = 10;
+    private final int MAX_PLANK_CONSTANT = 600;
+    private final int MAX_PUSHUPS_CONSTANT = 100;
+    private final int MAX_PULLUPS_CONSTANT = 100;
+    private final int MAX_SITUPS_CONSTANT = 100;
+    private final int MAX_SQUATS_CONSTANT = 100;
+    private final int MAX_TRICEPS_CONSTANT = 100;
+    private final int MAX_JUMPINGJACKS_CONSTANT = 100;
+    private final int MAX_LUNGES_CONSTANT = 100;
 
     private FirebaseAuth auth;
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Workouts");
     DatabaseReference badgeRef = database.getReference("Badges");
     DatabaseReference friendRef = database.getReference("Relationships");
+
+    private String currentYearWeek;
 
     /**
      *
@@ -88,9 +118,11 @@ public class DailyChallengeFragment extends Fragment {
 
         //Get Firebase previous workout values
         Calendar calendar = Calendar.getInstance();
-        DatabaseReference dateRef = ref.child("Year" + calendar.get(Calendar.YEAR) +
-                "Week" + calendar.get(Calendar.WEEK_OF_YEAR));
+        currentYearWeek = "Year" + calendar.get(Calendar.YEAR) +
+                "Week" + calendar.get(Calendar.WEEK_OF_YEAR);
+        DatabaseReference dateRef = ref.child(currentYearWeek);
         getPrevValues(dateRef);
+//        getPrevBadges();
 
         //Setup views
         View view = inflater.inflate(R.layout.fragment_daily_challenge, container, false);
@@ -129,8 +161,8 @@ public class DailyChallengeFragment extends Fragment {
             e.printStackTrace();
         }
         //For purposes of the demo, new date will be set to 5 minutes later:
-//        MyCount counter = new MyCount(10000, 1000);
-        MyCount counter = new MyCount(diff, 1000);
+        MyCount counter = new MyCount(30000, 1000);
+//        MyCount counter = new MyCount(diff, 1000);
         counter.start();
 
         day = calendar.get(Calendar.DAY_OF_WEEK);
@@ -217,7 +249,8 @@ public class DailyChallengeFragment extends Fragment {
 
         @Override
         public void onFinish() {
-            //assignBadges();
+            getPrevBadges();
+            calculateBadges();
             if(getActivity() != null) {
                 getActivity().recreate();
                 Toast.makeText(getActivity(), "It's a new day with a new Daily Challenge!", Toast.LENGTH_LONG).show();
@@ -267,8 +300,7 @@ public class DailyChallengeFragment extends Fragment {
             int act2;
 
             Calendar calendar = Calendar.getInstance();
-            DatabaseReference dateRef = ref.child("Year" + calendar.get(Calendar.YEAR) +
-                    "Week" + calendar.get(Calendar.WEEK_OF_YEAR));
+            DatabaseReference dateRef = ref.child(currentYearWeek);
 
             getPrevValues(dateRef);
 
@@ -317,31 +349,31 @@ public class DailyChallengeFragment extends Fragment {
             switch (day) {
                 case Calendar.SUNDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            prevPushups+act1, 0, prevSitups+act2, 0, 0, 0, 0));
+                            prevPushups+act1, prevPullups, prevSitups+act2, prevSquats, prevTricepDips, prevJumpingJacks, prevLunges));
                     break;
                 case Calendar.MONDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            0, prevPullups+act1, 0, prevSquats+act2, 0, 0, 0));
+                            prevPushups, prevPullups+act1, prevSitups, prevSquats+act2, prevTricepDips, prevJumpingJacks, prevLunges));
                     break;
                 case Calendar.TUESDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            0, 0, 0, 0, prevTricepDips+act1, prevJumpingJacks+act2, 0));
+                            prevPushups, prevPullups, prevSitups, prevSquats, prevTricepDips+act1, prevJumpingJacks+act2, prevLunges));
                     break;
                 case Calendar.WEDNESDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            prevPushups+act1, 0, 0, 0, 0, 0, prevLunges+act2));
+                            prevPushups+act1, prevPullups, prevSitups, prevSquats, prevTricepDips, prevJumpingJacks, prevLunges+act2));
                     break;
                 case Calendar.THURSDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            0, prevPullups+act1, prevSitups+act1, 0, 0, 0, 0));
+                            prevPushups, prevPullups+act1, prevSitups+act1, prevSquats, prevTricepDips, prevJumpingJacks, prevLunges));
                     break;
                 case Calendar.FRIDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            0, 0, 0, 0, prevTricepDips+act1, 0, prevLunges+act2));
+                            prevPushups, prevPullups, prevSitups, prevSquats, prevTricepDips+act1, prevJumpingJacks, prevLunges+act2));
                     break;
                 case Calendar.SATURDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
-                            0, 0, 0, prevSquats+act2, 0, prevJumpingJacks+act1, 0));
+                            prevPushups, prevPullups, prevSitups, prevSquats+act2, prevTricepDips, prevJumpingJacks+act1, prevLunges));
                     break;
             }
 
@@ -388,20 +420,23 @@ public class DailyChallengeFragment extends Fragment {
         quant4.setText("");
     }
 
-    public void assignBadges() {
-        final ArrayList<String> friendsList = new ArrayList<String>();
-        final ArrayList<Workout> finalWorkoutNumbers = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance();
-        friendRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+    public void getPrevBadges() {
+        badgeRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        friendsList.add(snapshot.getKey().toString());
-                    }
+                BadgeRecord prevBadges = dataSnapshot.getValue(BadgeRecord.class);
+                if(prevBadges != null) {
+                    prevRunBadges = prevBadges.getRunBadges();
+                    prevPlankBadges = prevBadges.getPlankBadges();
+                    prevPushupBadges = prevBadges.getPushupBadges();
+                    prevPullupBadges = prevBadges.getPullupBadges();
+                    prevSitupBadges = prevBadges.getSitupBadges();
+                    prevSquatBadges = prevBadges.getSquatBadges();
+                    prevTricepBadges = prevBadges.getTricepBadges();
+                    prevJumpingBadges = prevBadges.getJumpingBadges();
+                    prevLungeBadges = prevBadges.getLungeBadges();
                 }
-                //Toast.makeText(getActivity(), "Friend 1: " + friendsList.get(friendsList.size()-1), Toast.LENGTH_LONG).show();
-                Log.d("FUCK", "Last friend = " + friendsList.size());
+                //Toast.makeText(getActivity(), prevPlank, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -409,81 +444,78 @@ public class DailyChallengeFragment extends Fragment {
 
             }
         });
-        friendsList.add(auth.getUid());
-        Log.d("FUCK","friendsSize: " + friendsList.size());
-        for(int i=0; i<friendsList.size();i++) {
-            Log.d("FUCK","friendsList " + i + ": " + friendsList.get(i));
-            ref.child("Year" + calendar.get(Calendar.YEAR) +
-                    "Week" + calendar.get(Calendar.WEEK_OF_YEAR)).child(friendsList.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Workout friendWorkout = dataSnapshot.getValue(Workout.class);
-
-                    finalWorkoutNumbers.add(friendWorkout);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-        }
-        //String jumpingJacksWinner = friendsList.get(compareJumpingJacks(finalWorkoutNumbers));
-        //String runWinner = friendsList.get(compareRun(finalWorkoutNumbers));
-        int runWinner = compareRun(finalWorkoutNumbers);
-        Log.d("FUCK", "winner = " + runWinner);
-        //Toast.makeText(getActivity(), "Run Winner is: " + runWinner, Toast.LENGTH_LONG).show();
     }
 
-    public int compareJumpingJacks(ArrayList<Workout> workoutNumbers) {
-        int arrayOfNumbers[] = null;
-        int count = 0;
-        for (int i=0; i<workoutNumbers.size(); i++) {
-            arrayOfNumbers[i] = workoutNumbers.get(i).getJumpingJacks();
-        }
-        int maxIndex = 0;
-        for(int j=1; j<arrayOfNumbers.length; j++) {
-            if(arrayOfNumbers[j] > arrayOfNumbers[maxIndex]) {
-                maxIndex = j;
-            }
-        }
-        for(int k=0; k<arrayOfNumbers.length;k++) {
-            if (arrayOfNumbers[k] == arrayOfNumbers[maxIndex]) {
-                count++;
-                if(count > 1) {
-                    tieInNumbers = true;
-                    break;
+    public void calculateBadges() {
+        ref.child(currentYearWeek).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Workout prevWorkout = dataSnapshot.getValue(Workout.class);
+                if(prevWorkout != null) {
+                    totalRun = prevWorkout.getRun();
+                    totalPlank = prevWorkout.getPlank();
+                    totalPushups = prevWorkout.getPushups();
+                    totalPullups = prevWorkout.getPullups();
+                    totalSitups = prevWorkout.getSitups();
+                    totalSquats = prevWorkout.getSquats();
+                    totalTricepDips = prevWorkout.getTricepDips();
+                    totalJumpingJacks = prevWorkout.getJumpingJacks();
+                    totalLunges = prevWorkout.getLunges();
                 }
+                //Toast.makeText(getActivity(), prevPlank, Toast.LENGTH_LONG).show();
+
+                BadgeRecord updatedBadges = new BadgeRecord(prevRunBadges, prevPlankBadges,
+                        prevPushupBadges, prevPullupBadges, prevSitupBadges, prevSquatBadges, prevTricepBadges,
+                        prevJumpingBadges, prevLungeBadges);
+
+                if(totalRun >= MAX_RUN_CONSTANT) {
+                    updatedBadges.setRunBadges(prevRunBadges+1);
+                    Log.d("calculations","Run badge");
+                }
+                if(totalPlank >= MAX_PLANK_CONSTANT) {
+                    updatedBadges.setPlankBadges(prevPlankBadges+1);
+                    Log.d("calculations","Plank badge");
+                }
+                if(totalPushups >= MAX_PUSHUPS_CONSTANT) {
+                    updatedBadges.setPushupBadges(prevPushupBadges+1);
+                    Log.d("calculations","pushups badge");
+                }
+                if(totalPullups >= MAX_PULLUPS_CONSTANT) {
+                    updatedBadges.setPullupBadges(prevPullupBadges+1);
+                    Log.d("calculations","pullups badge");
+                }
+                if(totalSitups >= MAX_SITUPS_CONSTANT) {
+                    updatedBadges.setSitupBadges(prevSitupBadges+1);
+                    Log.d("calculations","situps badge");
+                }
+                if(totalSquats >= MAX_SQUATS_CONSTANT) {
+                    updatedBadges.setSquatBadges(prevSquatBadges+1);
+                    Log.d("calculations","squats badge");
+                }
+                if(totalTricepDips >= MAX_TRICEPS_CONSTANT) {
+                    updatedBadges.setTricepBadges(prevTricepBadges+1);
+                    Log.d("calculations","triceps badge");
+                }
+                if(totalJumpingJacks >= MAX_JUMPINGJACKS_CONSTANT) {
+                    updatedBadges.setJumpingBadges(prevJumpingBadges+1);
+                    Log.d("calculations","jumping badge");
+                }
+                if(totalLunges >= MAX_LUNGES_CONSTANT) {
+                    updatedBadges.setLungeBadges(prevLungeBadges+1);
+
+                    Log.d("calculations","lunges badge");
+                }
+                badgeRef.child(auth.getUid()).setValue(updatedBadges);
             }
-        }
-        return maxIndex;
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    public int compareRun(ArrayList<Workout> workoutNumbers) {
-        ArrayList<Float> arrayOfNumbers = new ArrayList<>();
-        int count = 0;
-        Log.d("FUCK", "size of workoutnumbers arraylist = " + workoutNumbers.size());
-        for (int i=0; i<workoutNumbers.size(); i++) {
-            arrayOfNumbers.add(workoutNumbers.get(i).getRun());
-            Log.d("FUCK", "Run: " + workoutNumbers.get(i).getRun());
-        }
-        int maxIndex = 0;
-        for(int j=1; j<arrayOfNumbers.size(); j++) {
-            if(arrayOfNumbers.get(j) > arrayOfNumbers.get(maxIndex)) {
-                maxIndex = j;
-            }
-        }
-        for(int k=0; k<arrayOfNumbers.size();k++) {
-            if (arrayOfNumbers.get(k) == arrayOfNumbers.get(maxIndex)) {
-                count++;
-                if(count > 1) {
-                    tieInNumbers = true;
-                    break;
-                }
-            }
-        }
-        return maxIndex;
+    public void assignBadges(String badge) {
+        badgeRef.child(auth.getUid()).child(badge).setValue("true");
     }
-
 }
