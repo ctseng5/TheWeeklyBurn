@@ -64,6 +64,9 @@ public class DailyChallengeFragment extends Fragment {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Workouts");
 
+    /**
+     *
+     */
     public DailyChallengeFragment() {
         // Required empty public constructor
     }
