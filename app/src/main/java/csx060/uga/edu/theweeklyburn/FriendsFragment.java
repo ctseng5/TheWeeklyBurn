@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -132,9 +133,41 @@ public class FriendsFragment extends Fragment {
                 final String fullName = users.getFirstName() + " " + users.getLastName();
                 final String otherUid = users.getUid();
                 final UserViewHolder viewHolder = holder;
+                String profileImage = "";
+
                 viewHolder.setUserName(fullName);
                 viewHolder.setUserPhone(users.getPhoneNumber());
-                viewHolder.setUserImage(R.drawable.icon);
+
+                switch(users.getProfilePicNum()){
+                    case 0:
+                        profileImage = "pro_pic_1";
+                        break;
+                    case 1:
+                        profileImage = "pro_pic_2";
+                        break;
+                    case 2:
+                        profileImage = "pro_pic_3";
+                        break;
+                    case 3:
+                        profileImage = "pro_pic_4";
+                        break;
+                    case 4:
+                        profileImage = "pro_pic_5";
+                        break;
+                    case 5:
+                        profileImage = "pro_pic_6";
+                        break;
+                    case 6:
+                        profileImage = "pro_pic_7";
+                        break;
+                    case 7:
+                        profileImage = "pro_pic_8";
+                        break;
+                    case 8:
+                        profileImage = "pro_pic_9";
+                        break;
+                }
+                viewHolder.setUserImage(getResources().getIdentifier(profileImage, "drawable", getContext().getPackageName()));
 
                 RelationRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

@@ -7,13 +7,16 @@ public class User {
     public String email;
     public String phoneNumber;
     public String uid;
+    public int profilePicNum;
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String uid) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String uid, int
+                profilePicNum) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.uid = uid;
+        this.profilePicNum = profilePicNum;
     }
 
     public User () {
@@ -22,6 +25,7 @@ public class User {
         email = "";
         phoneNumber = "";
         uid = "";
+        profilePicNum = 0;
     }
 
     public User(String uid){
@@ -66,5 +70,13 @@ public class User {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public int getProfilePicNum() {
+        return profilePicNum;
+    }
+
+    public void setProfilePicNum(int profilePicNum) {
+        this.profilePicNum = profilePicNum;
     }
 }
