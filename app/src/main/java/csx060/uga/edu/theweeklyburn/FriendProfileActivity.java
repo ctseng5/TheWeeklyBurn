@@ -312,10 +312,15 @@ public class FriendProfileActivity extends AppCompatActivity {
         return friend;
     }
 
+    /**
+     * Retreives the number of badges for the user and displays them on the profile
+     * @param badgeDatabase
+     */
     public void getBadges(DatabaseReference badgeDatabase) {
         badgeDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //If there is an entry for user, set the values to the numbers
                 if(dataSnapshot.exists()) {
                     BadgeRecord badgeRecord = dataSnapshot.getValue(BadgeRecord.class);
                     badge1Number = Integer.toString(badgeRecord.getRunBadges());
@@ -339,6 +344,7 @@ public class FriendProfileActivity extends AppCompatActivity {
                     badge8.setText("Jumping Jacks Badges: " + badge8Number);
                     badge9.setText("Lunge Badges: " + badge9Number);
                 }
+                //If there is no entry for the user, set all values to 0.
                 else {
                     badge1.setText("Run Badges: 0");
                     badge2.setText("Plank Badges: 0");

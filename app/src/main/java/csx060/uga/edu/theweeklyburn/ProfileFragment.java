@@ -1,3 +1,9 @@
+/**
+ * Profile Fragment
+ * @authors: Jeffrey Kao & Michael Tseng
+ * The fragment that displays the current user's info
+ */
+
 package csx060.uga.edu.theweeklyburn;
 
 
@@ -25,14 +31,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-
 
 /**
- * A simple {@link Fragment} subclass.
+ * Creates a ProfileFragment
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
+    //Initialize global variables
     private TextView userName;
     private TextView userEmail;
     private TextView userPhone;
@@ -85,6 +90,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // Required empty public constructor
     }
 
+    /**
+     * Creates the views
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -98,14 +110,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         friendsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         badgeDatabase = database.getReference().child("Badges").child(auth.getUid());
-//        badgeList = (RecyclerView) view.findViewById(R.id.badgeList);
-//        badgeList.setHasFixedSize(true);
-//        badgeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         DatabaseReference userRef = ref.child("users");
         getUserInfo(userRef);
 
-
+        //Find badge views
         badge1 = view.findViewById(R.id.badge1);
         badge2 = view.findViewById(R.id.badge2);
         badge3 = view.findViewById(R.id.badge3);
@@ -117,7 +126,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         badge9 = view.findViewById(R.id.badge9);
 
 
-
+        //Set user info
         userName = view.findViewById(R.id.userName);
         userEmail = view.findViewById(R.id.userEmail);
         userPhone = view.findViewById(R.id.userPhone);
@@ -129,6 +138,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    /**
+     * Shows the views onStart
+     */
     @Override
     public void onStart(){
         super.onStart();
@@ -136,24 +148,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         optionsFriends = new FirebaseRecyclerOptions.Builder<Relationships>()
                 .setQuery(friendsDatabase, Relationships.class)
                 .build();
-//
-//        optionsBadges = new FirebaseRecyclerOptions.Builder<BadgeRecord>()
-//                .setQuery(badgeDatabase, BadgeRecord.class)
-//                .build();
 
-//        adapterBadge = createAdapterBadge(optionsBadges);
         adapter = createAdapterFriends(optionsFriends);
 
         friendsList.setAdapter(adapter);
-//        badgeList.setAdapter(adapterBadge);
         adapter.startListening();
 
         getBadges(badgeDatabase);
-//        badge1.setText("hello");
-//        badge2.setText("it's");
-//        badge3.setText("me");
     }
 
+    /**
+     * Creates a FirebaseRecyclerAdapter to show friend's list
+     * @param optionsFriends
+     * @return
+     */
     public FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createAdapterFriends(FirebaseRecyclerOptions<Relationships> optionsFriends){
         FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder>(optionsFriends){
             @Override
@@ -165,6 +173,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 User friend = getFriendInfo(otherUid, viewHolder);
 
+                //Clicking on a friend will open their profile in a new activity
                 viewHolder.friendImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -186,38 +195,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return createdadapter;
     }
 
-    public FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder> createAdapterBadge(FirebaseRecyclerOptions<BadgeRecord> optionsBadges){
-        FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder>(optionsBadges){
-            @Override
-            protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull BadgeRecord badgeList) {
-                ProfileFragment.UserViewHolder viewHolder = holder;
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getRunBadges()), 1);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getPlankBadges()),2);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getPushupBadges()),3);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getPullupBadges()),4);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getSitupBadges()),5);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getSquatBadges()),6);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getTricepBadges()),7);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getJumpingBadges()),8);
-                viewHolder.setBadgeTotal(Integer.toString(badgeList.getLungeBadges()),9);
-
-                for(int i = 1; i < 10; i++) {
-                    String profileBadgeImage = "badge" + Integer.toString(i);
-                    viewHolder.setBadgeImage(getResources().getIdentifier(profileBadgeImage, "drawable", getContext().getPackageName()), i);
-                }
-            }
-
-            @NonNull
-            @Override
-            public ProfileFragment.UserViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                View userView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_user_badge, viewGroup, false);
-
-                return new ProfileFragment.UserViewHolder(userView);
-            }
-        };
-        return createdadapter;
-    }
-
+    /**
+     * When signout button is clicked, sign the user out
+     */
     @Override
     public void onClick(View view) {
         auth.signOut();
@@ -229,6 +209,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         startActivity(loginScreen);
     }
 
+    /**
+     * Gets the user's info from the DB
+     * @param userRef
+     */
     public void getUserInfo(DatabaseReference userRef) {
         userRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -241,6 +225,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     email = user.getEmail();
                     phone = user.getPhoneNumber();
 
+                    //Sets the users profile picture
                     switch(user.getProfilePicNum()){
                         case 0:
                             profileImage = "pro_pic_1";
@@ -284,6 +269,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    /**
+     * Creates a UserViewHolder
+     */
     public static class UserViewHolder extends RecyclerView.ViewHolder{
         TextView friendFname;
         ImageView friendImage;
@@ -409,6 +397,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Get list of friends from the DB
+     * @param friendUid
+     * @param viewHolder
+     * @return
+     */
     public User getFriendInfo(String friendUid, final ProfileFragment.UserViewHolder viewHolder) {
         DatabaseReference userRef = ref.child("users").child(friendUid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -459,10 +453,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return friend;
     }
 
+    /**
+     * Retreives the number of badges for the user and displays them on the profile
+     * @param badgeDatabase
+     */
     public void getBadges(DatabaseReference badgeDatabase) {
         badgeDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //If there is an entry for user, set the values to the numbers
                 if(dataSnapshot.exists()) {
                     BadgeRecord badgeRecord = dataSnapshot.getValue(BadgeRecord.class);
                     badge1Number = Integer.toString(badgeRecord.getRunBadges());
@@ -486,6 +485,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     badge8.setText("Jumping Jacks Badges: " + badge8Number);
                     badge9.setText("Lunge Badges: " + badge9Number);
                 }
+                //If there is no entry for the user, set all values to 0.
                 else {
                     badge1.setText("Run Badges: 0");
                     badge2.setText("Plank Badges: 0");
