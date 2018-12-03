@@ -1,3 +1,8 @@
+/**
+ * Splash Screen Activity
+ * @authors: Jeffrey Kao & Michael Tseng
+ * Shows the app name, a description, and buttons for sign up and login
+ */
 package csx060.uga.edu.theweeklyburn;
 
 import android.content.Intent;
@@ -15,14 +20,22 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * Creates the Splash activity
+ */
 public class Splash extends AppCompatActivity {
 
+    //initialize global variables
     private FirebaseAuth mAuth;
     private EditText emailField;
     private EditText passwordField;
     private Button signInButton;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    /**
+     * Creates the views
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +44,7 @@ public class Splash extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         emailField = (EditText) findViewById(R.id.emailField);
         passwordField = (EditText) findViewById(R.id.passwordField);
-        signInButton = (Button) findViewById(R.id.signInButton);
+        signInButton = (Button) findViewById(R.id.resetButton);
 
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,11 +64,18 @@ public class Splash extends AppCompatActivity {
         };
     }
 
+    /**
+     * Detect to see if user is logged in
+     */
     @Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
+
+    /**
+     * Gets sign in credentials and logs the user in automatically
+     */
     private void startSignIn() {
         String email = emailField.getText().toString();
         String password = passwordField.getText().toString();

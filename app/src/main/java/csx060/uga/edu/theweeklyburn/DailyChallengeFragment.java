@@ -129,8 +129,8 @@ public class DailyChallengeFragment extends Fragment {
             e.printStackTrace();
         }
         //For purposes of the demo, new date will be set to 5 minutes later:
-        MyCount counter = new MyCount(10000, 1000);
-//        MyCount counter = new MyCount(diff, 1000);
+//        MyCount counter = new MyCount(10000, 1000);
+        MyCount counter = new MyCount(diff, 1000);
         counter.start();
 
         day = calendar.get(Calendar.DAY_OF_WEEK);
@@ -218,9 +218,10 @@ public class DailyChallengeFragment extends Fragment {
         @Override
         public void onFinish() {
             //assignBadges();
-            getActivity().recreate();
-            Toast.makeText(getActivity(), "It's a new day with a new Daily Challenge!", Toast.LENGTH_LONG).show();
-
+            if(getActivity() != null) {
+                getActivity().recreate();
+                Toast.makeText(getActivity(), "It's a new day with a new Daily Challenge!", Toast.LENGTH_LONG).show();
+            }
         }
 
         @Override
