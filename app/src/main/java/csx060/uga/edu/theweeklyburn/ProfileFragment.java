@@ -147,9 +147,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Intent loginScreen = new Intent(getActivity(), LoginActivity.class);
 
         Toast.makeText(getActivity(), "Successfully signed out", Toast.LENGTH_LONG).show();
-        getActivity().finish();
         loginScreen.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        getActivity().finish();
         startActivity(loginScreen);
+
     }
 
     public void getUserInfo(DatabaseReference userRef) {

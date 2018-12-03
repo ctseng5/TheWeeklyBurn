@@ -1,3 +1,9 @@
+/**
+ * Sign Up Activity
+ * @authors: Jeffrey Kao & Michael Tseng
+ * This Activity allows the user to sign up for an account
+ */
+
 package csx060.uga.edu.theweeklyburn;
 
 import android.content.Intent;
@@ -21,9 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Random;
 
-
+/**
+ * Main class for SignUpActivity
+ */
 public class SignUpActivity extends AppCompatActivity {
 
+    //Initialize global variables
     private Button signUpButton;
     private Button loginButton;
     private TextView emailInput;
@@ -34,9 +43,15 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView phoneNum;
     private TextView passwordMessage;
     private FirebaseAuth auth;
+    //Reference to Firebase Database
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    //Reference to Information table
     DatabaseReference ref = database.getReference("Information");
 
+    /**
+     * Creates the views for the signup activity.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
         //Get Firebase Auth instance
         auth = FirebaseAuth.getInstance();
 
+        //Create views
         signUpButton = findViewById(R.id.signUpButton);
         signUpButton.setEnabled(false);
         signUpButton.setOnClickListener(new SignUpOnClickListener());
@@ -62,6 +78,10 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * On click listener for the login option if the user already has an account
+     * Starts the LoginActivity
+     */
     private class LoginOnClickListener implements View.OnClickListener {
         public void onClick(View view) {
             Intent intent = new Intent(view.getContext(), LoginActivity.class);
@@ -69,6 +89,10 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * TextWatcher to see see if the password and password confirmation fields match.
+     * If they don't display a warning message
+     */
     private class PasswordListener implements TextWatcher {
 
         @Override
@@ -94,6 +118,10 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * On click listener for the sign up button
+     * Clicking on button will get all the text from the fields and create the user
+     */
     private class SignUpOnClickListener implements View.OnClickListener {
         public void onClick(View view) {
 
@@ -102,8 +130,11 @@ public class SignUpActivity extends AppCompatActivity {
             final String fname = firstName.getText().toString().trim();
             final String lname = lastName.getText().toString().trim();
             final String phone = phoneNum.getText().toString().trim();
+            //Random number is used to assign a random profile picture.
             final int randNum = new Random().nextInt(10);
 
+
+            //If any fields are empty, display error toast message
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
                 return;
@@ -134,10 +165,17 @@ public class SignUpActivity extends AppCompatActivity {
                 return;
             }
 
-            //User newUser = new User(fname, lname, email, phone);
-
+            /**
+             * Create new user using email and password using Firebase auth
+             */
             auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
+                /**
+                 * If account creation is completed, add field to Firebase Authentication
+                 * Also add a new database entry for user's first name, last name, email, phone, userID,
+                 * and a random number for profile picture.
+                 * @param task
+                 */
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     Toast.makeText(SignUpActivity.this, "Created Account:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
