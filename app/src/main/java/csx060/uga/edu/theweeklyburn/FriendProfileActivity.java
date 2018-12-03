@@ -1,19 +1,14 @@
 package csx060.uga.edu.theweeklyburn;
 
-
-import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,18 +17,13 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
-public class ProfileFragment extends Fragment implements View.OnClickListener {
+public class FriendProfileActivity extends AppCompatActivity {
 
     private TextView userName;
     private TextView userEmail;
@@ -41,11 +31,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Button signOutButton;
     private ImageView userImage;
     private FirebaseAuth auth;
+    private String currentDisplayUser;
 
     private String name = "";
     private String email = "";
     private String phone = "";
+    private String uid = "";
     private User friend;
+
 
     private RecyclerView friendsList;
     private RecyclerView badgeList;
@@ -57,39 +50,34 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Information");
 
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_friend_profile);
 
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
         auth = FirebaseAuth.getInstance();
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            uid = extras.getString("key");
+        }
 
-        friendsDatabase = database.getReference().child("Relationships").child(auth.getUid());
-        friendsList = (RecyclerView) view.findViewById(R.id.friendsList);
+        friendsDatabase = database.getReference().child("Relationships").child(uid);
+        friendsList = (RecyclerView) findViewById(R.id.friendsList);
         friendsList.setHasFixedSize(true);
-        friendsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        friendsList.setLayoutManager(new LinearLayoutManager(getBaseContext(), LinearLayoutManager.HORIZONTAL, false));
 
-        badgeDatabase = database.getReference().child("Badges").child(auth.getUid());
-        badgeList = (RecyclerView) view.findViewById(R.id.badgeList);
+        badgeDatabase = database.getReference().child("Badges").child(uid);
+        badgeList = (RecyclerView) findViewById(R.id.badgeList);
         badgeList.setHasFixedSize(true);
-        badgeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        badgeList.setLayoutManager(new LinearLayoutManager(getBaseContext(), LinearLayoutManager.HORIZONTAL, false));
 
         DatabaseReference userRef = ref.child("users");
         getUserInfo(userRef);
 
-        userName = view.findViewById(R.id.userName);
-        userEmail = view.findViewById(R.id.userEmail);
-        userPhone = view.findViewById(R.id.userPhone);
-        userImage = view.findViewById(R.id.imageView2);
-
-        signOutButton = view.findViewById(R.id.signOutButton);
-        signOutButton.setOnClickListener(this);
-
-        return view;
+        userName = findViewById(R.id.userName);
+        userEmail = findViewById(R.id.userEmail);
+        userPhone = findViewById(R.id.userPhone);
+        userImage = findViewById(R.id.imageView2);
     }
 
     @Override
@@ -113,17 +101,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 System.out.println("other UID: " + otherUid);
 
                 ProfileFragment.UserViewHolder viewHolder = holder;
+                //DatabaseReference friendRef = ref.child("user").child(otherUid);
 
                 User friend = getFriendInfo(otherUid, viewHolder);
-
-                viewHolder.friendImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent friendIntent = new Intent(getActivity(), FriendProfileActivity.class);
-                        friendIntent.putExtra("key",otherUid);
-                        startActivity(friendIntent);
-                    }
-                });
             }
 
             @NonNull
@@ -137,19 +117,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return createdadapter;
     }
 
-    @Override
-    public void onClick(View view) {
-        auth.signOut();
-        Intent loginScreen = new Intent(getActivity(), LoginActivity.class);
-
-        Toast.makeText(getActivity(), "Successfully signed out", Toast.LENGTH_LONG).show();
-        loginScreen.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
-        getActivity().finish();
-        startActivity(loginScreen);
-    }
-
     public void getUserInfo(DatabaseReference userRef) {
-        userRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
@@ -195,17 +164,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 userName.setText(name);
                 userEmail.setText("Email: " + email);
                 userPhone.setText("Phone: " + phone);
-                userImage.setImageResource(getResources().getIdentifier(profileImage, "drawable", getContext().getPackageName()));
-                //Toast.makeText(getActivity(), prevPlank, Toast.LENGTH_LONG).show();
+                userImage.setImageResource(getResources().getIdentifier(profileImage, "drawable", getPackageName()));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
 
-    public static class UserViewHolder extends RecyclerView.ViewHolder{
+    public class UserViewHolder extends RecyclerView.ViewHolder{
         TextView friendFname;
         ImageView friendImage;
 
@@ -265,11 +234,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
 
                 viewHolder.setFriendName(fullName);
-                viewHolder.setFriendImage(getResources().getIdentifier(profileFriendimage, "drawable", getContext().getPackageName()));
+                viewHolder.setFriendImage(getResources().getIdentifier(profileFriendimage, "drawable", getPackageName()));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
         return friend;
