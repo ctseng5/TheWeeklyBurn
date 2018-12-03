@@ -1,19 +1,15 @@
 package csx060.uga.edu.theweeklyburn;
 
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,12 +18,13 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
 /**
@@ -46,13 +43,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private String email = "";
     private String phone = "";
     private User friend;
+    private BadgeRecord badges;
 
     private RecyclerView friendsList;
     private RecyclerView badgeList;
     private DatabaseReference friendsDatabase;
     private DatabaseReference badgeDatabase;
     private FirebaseRecyclerOptions<Relationships> optionsFriends;
+    private FirebaseRecyclerOptions<BadgeRecord> optionsBadges;
     private FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> adapter;
+    private FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder> adapterBadge;
+    private int count = 1;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Information");
@@ -76,7 +77,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         badgeDatabase = database.getReference().child("Badges").child(auth.getUid());
         badgeList = (RecyclerView) view.findViewById(R.id.badgeList);
         badgeList.setHasFixedSize(true);
-        badgeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        badgeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         DatabaseReference userRef = ref.child("users");
         getUserInfo(userRef);
@@ -99,10 +100,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         optionsFriends = new FirebaseRecyclerOptions.Builder<Relationships>()
                 .setQuery(friendsDatabase, Relationships.class)
                 .build();
+//
+//        optionsBadges = new FirebaseRecyclerOptions.Builder<BadgeRecord>()
+//                .setQuery(badgeDatabase, BadgeRecord.class)
+//                .build();
 
+//        adapterBadge = createAdapterBadge(optionsBadges);
         adapter = createAdapterFriends(optionsFriends);
+
         friendsList.setAdapter(adapter);
+//        badgeList.setAdapter(adapterBadge);
         adapter.startListening();
+        adapterBadge.startListening();
     }
 
     public FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createAdapterFriends(FirebaseRecyclerOptions<Relationships> optionsFriends){
@@ -137,6 +146,38 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return createdadapter;
     }
 
+    public FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder> createAdapterBadge(FirebaseRecyclerOptions<BadgeRecord> optionsBadges){
+        FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder>(optionsBadges){
+            @Override
+            protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull BadgeRecord badgeList) {
+                ProfileFragment.UserViewHolder viewHolder = holder;
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getRunBadges()), 1);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getPlankBadges()),2);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getPushupBadges()),3);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getPullupBadges()),4);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getSitupBadges()),5);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getSquatBadges()),6);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getTricepBadges()),7);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getJumpingBadges()),8);
+                viewHolder.setBadgeTotal(Integer.toString(badgeList.getLungeBadges()),9);
+
+                for(int i = 1; i < 10; i++) {
+                    String profileBadgeImage = "badge" + Integer.toString(i);
+                    viewHolder.setBadgeImage(getResources().getIdentifier(profileBadgeImage, "drawable", getContext().getPackageName()), i);
+                }
+            }
+
+            @NonNull
+            @Override
+            public ProfileFragment.UserViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                View userView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_user_badge, viewGroup, false);
+
+                return new ProfileFragment.UserViewHolder(userView);
+            }
+        };
+        return createdadapter;
+    }
+
     @Override
     public void onClick(View view) {
         auth.signOut();
@@ -155,7 +196,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 User user = dataSnapshot.getValue(User.class);
                 String profileImage = "";
 
-                //Workout prevWorkout = dataSnapshot.getValue(Workout.class);
                 if(user != null) {
                     name = user.getFirstName() + " " + user.getLastName();
                     email = user.getEmail();
@@ -196,7 +236,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 userEmail.setText("Email: " + email);
                 userPhone.setText("Phone: " + phone);
                 userImage.setImageResource(getResources().getIdentifier(profileImage, "drawable", getContext().getPackageName()));
-                //Toast.makeText(getActivity(), prevPlank, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -208,12 +247,51 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public static class UserViewHolder extends RecyclerView.ViewHolder{
         TextView friendFname;
         ImageView friendImage;
+        TextView userTrophyTotal;
+        TextView userTrophyTotal2;
+        TextView userTrophyTotal3;
+        TextView userTrophyTotal4;
+        TextView userTrophyTotal5;
+        TextView userTrophyTotal6;
+        TextView userTrophyTotal7;
+        TextView userTrophyTotal8;
+        TextView userTrophyTotal9;
+        ImageView userBadgeImage;
+        ImageView userBadgeImage2;
+        ImageView userBadgeImage3;
+        ImageView userBadgeImage4;
+        ImageView userBadgeImage5;
+        ImageView userBadgeImage6;
+        ImageView userBadgeImage7;
+        ImageView userBadgeImage8;
+        ImageView userBadgeImage9;
+
 
         public UserViewHolder(View itemView){
             super(itemView);
 
             friendFname = itemView.findViewById(R.id.friendFname);
             friendImage = itemView.findViewById(R.id.imageView3);
+            userTrophyTotal = itemView.findViewById(R.id.trophyTotal);
+            userTrophyTotal2 = itemView.findViewById(R.id.trophyTotal2);
+            userTrophyTotal3 = itemView.findViewById(R.id.trophyTotal3);
+            userTrophyTotal4 = itemView.findViewById(R.id.trophyTotal4);
+            userTrophyTotal5 = itemView.findViewById(R.id.trophyTotal5);
+            userTrophyTotal6 = itemView.findViewById(R.id.trophyTotal6);
+            userTrophyTotal7 = itemView.findViewById(R.id.trophyTotal7);
+            userTrophyTotal8 = itemView.findViewById(R.id.trophyTotal8);
+            userTrophyTotal9 = itemView.findViewById(R.id.trophyTotal9);
+            userBadgeImage = itemView.findViewById(R.id.trophyImage);
+            userBadgeImage2 = itemView.findViewById(R.id.trophyImage2);
+            userBadgeImage3 = itemView.findViewById(R.id.trophyImage3);
+            userBadgeImage4 = itemView.findViewById(R.id.trophyImage4);
+            userBadgeImage5 = itemView.findViewById(R.id.trophyImage5);
+            userBadgeImage6 = itemView.findViewById(R.id.trophyImage6);
+            userBadgeImage7 = itemView.findViewById(R.id.trophyImage7);
+            userBadgeImage8 = itemView.findViewById(R.id.trophyImage8);
+            userBadgeImage9 = itemView.findViewById(R.id.trophyImage9);
+
+
         }
 
         public void setFriendName(String fullName){
@@ -222,6 +300,72 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         public void setFriendImage(int image){
             friendImage.setImageResource(image);
+        }
+
+        public void setBadgeTotal(String total, int num){
+            switch(num) {
+                case 1:
+                    userTrophyTotal.setText(total);
+                    break;
+                case 2:
+                    userTrophyTotal2.setText(total);
+                    break;
+                case 3:
+                    userTrophyTotal3.setText(total);
+                    break;
+                case 4:
+                    userTrophyTotal4.setText(total);
+                    break;
+                case 5:
+                    userTrophyTotal5.setText(total);
+                    break;
+                case 6:
+                    userTrophyTotal6.setText(total);
+                    break;
+                case 7:
+                    userTrophyTotal7.setText(total);
+                    break;
+                case 8:
+                    userTrophyTotal8.setText(total);
+                    break;
+                case 9:
+                    userTrophyTotal9.setText(total);
+                    break;
+
+            }
+        }
+
+        public void setBadgeImage(int image, int num){
+            switch(num) {
+                case 1:
+                    userBadgeImage.setImageResource(image);
+                    ;
+                    break;
+                case 2:
+                    userBadgeImage2.setImageResource(image);
+                    break;
+                case 3:
+                    userBadgeImage3.setImageResource(image);
+                    break;
+                case 4:
+                    userBadgeImage4.setImageResource(image);
+                    break;
+                case 5:
+                    userBadgeImage5.setImageResource(image);
+                    break;
+                case 6:
+                    userBadgeImage6.setImageResource(image);
+                    break;
+                case 7:
+                    userBadgeImage7.setImageResource(image);
+                    break;
+                case 8:
+                    userBadgeImage8.setImageResource(image);
+                    break;
+                case 9:
+                    userBadgeImage9.setImageResource(image);
+                    break;
+            }
         }
     }
 
