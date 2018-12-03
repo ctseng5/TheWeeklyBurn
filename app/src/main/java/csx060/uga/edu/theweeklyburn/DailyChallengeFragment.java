@@ -1,3 +1,12 @@
+/**
+ * Daily Challenge Fragment
+ * @authors: Jeffrey Kao & Michael Tseng
+ * Contains all implementation and logic for the Daily Challenge tab
+ * Here, users can go to see what the 4 challenges of the day are. They can record their workouts,
+ * which will be added to the DB. There is also a timer countdown to show how much time is remaining
+ * in the day.
+ */
+
 package csx060.uga.edu.theweeklyburn;
 
 
@@ -32,10 +41,22 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Creates the DailyChallengeFragment
  */
 public class DailyChallengeFragment extends Fragment {
 
+    //Constants for minimum number of each activity in order to earn a badge
+    private final int MAX_RUN_CONSTANT = 10;
+    private final int MAX_PLANK_CONSTANT = 600;
+    private final int MAX_PUSHUPS_CONSTANT = 100;
+    private final int MAX_PULLUPS_CONSTANT = 100;
+    private final int MAX_SITUPS_CONSTANT = 100;
+    private final int MAX_SQUATS_CONSTANT = 100;
+    private final int MAX_TRICEPS_CONSTANT = 100;
+    private final int MAX_JUMPINGJACKS_CONSTANT = 100;
+    private final int MAX_LUNGES_CONSTANT = 100;
+
+    //Views
     private TextView dayOfTheWeek;
     private TextView activity1;
     private TextView activity2;
@@ -48,6 +69,7 @@ public class DailyChallengeFragment extends Fragment {
     private Button submit;
     private TextView countdown;
 
+    //Previous workout variables
     private float prevRun = 0;
     private int prevPlank = 0;
     private int prevPushups = 0;
@@ -58,6 +80,7 @@ public class DailyChallengeFragment extends Fragment {
     private int prevJumpingJacks = 0;
     private int prevLunges = 0;
 
+    //Previous badge count variables
     private int prevRunBadges = 0;
     private int prevPlankBadges = 0;
     private int prevPushupBadges = 0;
@@ -68,6 +91,7 @@ public class DailyChallengeFragment extends Fragment {
     private int prevJumpingBadges = 0;
     private int prevLungeBadges = 0;
 
+    //Total number of activities variables
     private float totalRun = 0;
     private int totalPlank = 0;
     private int totalPushups = 0;
@@ -78,20 +102,11 @@ public class DailyChallengeFragment extends Fragment {
     private int totalJumpingJacks = 0;
     private int totalLunges = 0;
 
+    //Time variables
     private long diff;
     private long oldLong;
     private long newLong;
     private int day;
-
-    private final int MAX_RUN_CONSTANT = 10;
-    private final int MAX_PLANK_CONSTANT = 600;
-    private final int MAX_PUSHUPS_CONSTANT = 100;
-    private final int MAX_PULLUPS_CONSTANT = 100;
-    private final int MAX_SITUPS_CONSTANT = 100;
-    private final int MAX_SQUATS_CONSTANT = 100;
-    private final int MAX_TRICEPS_CONSTANT = 100;
-    private final int MAX_JUMPINGJACKS_CONSTANT = 100;
-    private final int MAX_LUNGES_CONSTANT = 100;
 
     private FirebaseAuth auth;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -108,7 +123,13 @@ public class DailyChallengeFragment extends Fragment {
         // Required empty public constructor
     }
 
-
+    /**
+     * Creates the views
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -145,6 +166,7 @@ public class DailyChallengeFragment extends Fragment {
 
         submit.setOnClickListener(new SubmitWorkoutClickListener());
 
+        //Timer calculations
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyy, HH:mm");
         //oldLong = System.currentTimeMillis();
         String oldTime = getCurrentTime();
@@ -160,18 +182,19 @@ public class DailyChallengeFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        //For purposes of the demo, new date will be set to 5 minutes later:
-        MyCount counter = new MyCount(30000, 1000);
-//        MyCount counter = new MyCount(diff, 1000);
+        //For purposes of the demo, new date will be set to:
+//        MyCount counter = new MyCount(30000, 1000);
+        MyCount counter = new MyCount(diff, 1000);
         counter.start();
 
         day = calendar.get(Calendar.DAY_OF_WEEK);
 
-//        if (day == Calendar.SUNDAY) {
-//            assignBadges();
-//        }
+        if (day == Calendar.SUNDAY) {
+            getPrevBadges();
+            calculateBadges();
+        }
 
-
+        //Depending on the day, set different workouts
         switch (day) {
             case Calendar.SUNDAY:
                 dayOfTheWeek.setText("Sunday");
@@ -227,6 +250,10 @@ public class DailyChallengeFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Returns a string with the current time formatted
+     * @return
+     */
     private String getCurrentTime() {
         Calendar calendar = Calendar.getInstance();
         Date today = calendar.getTime();
@@ -234,6 +261,10 @@ public class DailyChallengeFragment extends Fragment {
         return dateFormat.format(today);
     }
 
+    /**
+     * Return tomorrow's date at 00:00 time formatted
+     * @return
+     */
     private String getTomorrowsDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_YEAR, 1);
@@ -242,6 +273,9 @@ public class DailyChallengeFragment extends Fragment {
         return dateFormat.format(tomorrow) + ", 00:00";
     }
 
+    /**
+     * Timer class - creates a countdown timer
+     */
     public class MyCount extends CountDownTimer {
         MyCount(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
@@ -249,8 +283,7 @@ public class DailyChallengeFragment extends Fragment {
 
         @Override
         public void onFinish() {
-            getPrevBadges();
-            calculateBadges();
+
             if(getActivity() != null) {
                 getActivity().recreate();
                 Toast.makeText(getActivity(), "It's a new day with a new Daily Challenge!", Toast.LENGTH_LONG).show();
@@ -281,6 +314,9 @@ public class DailyChallengeFragment extends Fragment {
         public void afterTextChanged(Editable editable) {        }
     }
 
+    /**
+     * Checks to see if there is text in any of the 4 fields. If not, disable the submit button
+     */
     public void checkFields() {
         if (quant1.getText().toString().isEmpty() && quant2.getText().toString().isEmpty() &&
                 quant3.getText().toString().isEmpty() && quant4.getText().toString().isEmpty()) {
@@ -290,6 +326,11 @@ public class DailyChallengeFragment extends Fragment {
         }
     }
 
+    /**
+     * Button click listener for the submit button
+     * Clicking submit will fetch the values in the fields, create a new workout, and write it
+     * to the database.
+     */
     public class SubmitWorkoutClickListener implements View.OnClickListener {
 
         @Override
@@ -341,11 +382,9 @@ public class DailyChallengeFragment extends Fragment {
             }
 
             //Write to the database
-
-
             int day = calendar.get(Calendar.DAY_OF_WEEK);
 
-            //Toast.makeText(getActivity(), prevPushups, Toast.LENGTH_LONG).show();
+            //Depending on which day it is, update certain fields.
             switch (day) {
                 case Calendar.SUNDAY:
                     dateRef.child(auth.getUid()).setValue(new Workout(prevRun+run, prevPlank+plank,
@@ -377,16 +416,16 @@ public class DailyChallengeFragment extends Fragment {
                     break;
             }
 
+            //Clear the text fields
             resetEditText();
             Toast.makeText(getActivity(), "Your workout has been recorded!", Toast.LENGTH_LONG).show();
-//            Toast.makeText(getActivity(), "Your workout has been recorded!" +
-//                                                "\nRun: " + run +
-//                                                "\nPlank: " + plank +
-//                                                "\nAct1: " + act1 +
-//                                                "\nAct2: " + act2, Toast.LENGTH_LONG).show();
         }
     }
 
+    /**
+     * Fetches from the DB the previous values of the workouts so that they can be added to the new values.
+     * @param dateRef
+     */
     public void getPrevValues(DatabaseReference dateRef) {
         dateRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -413,6 +452,9 @@ public class DailyChallengeFragment extends Fragment {
         });
     }
 
+    /**
+     * Clears the text fields after submission
+     */
     public void resetEditText() {
         quant1.setText("");
         quant2.setText("");
@@ -420,6 +462,10 @@ public class DailyChallengeFragment extends Fragment {
         quant4.setText("");
     }
 
+    /**
+     * Fetches from the database the previous number of badges stored so they can be added to the
+     * new badges.
+     */
     public void getPrevBadges() {
         badgeRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -446,6 +492,11 @@ public class DailyChallengeFragment extends Fragment {
         });
     }
 
+    /**
+     * Assigns badges to the user if they reached the minimum requirements.
+     * After determining which workouts were reached, will add badges to the total and write them
+     * to the DB
+     */
     public void calculateBadges() {
         ref.child(currentYearWeek).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -464,10 +515,12 @@ public class DailyChallengeFragment extends Fragment {
                 }
                 //Toast.makeText(getActivity(), prevPlank, Toast.LENGTH_LONG).show();
 
+                //Create a new BadgeRecord with the previous values
                 BadgeRecord updatedBadges = new BadgeRecord(prevRunBadges, prevPlankBadges,
                         prevPushupBadges, prevPullupBadges, prevSitupBadges, prevSquatBadges, prevTricepBadges,
                         prevJumpingBadges, prevLungeBadges);
 
+                //If conditions to see which badges were earned
                 if(totalRun >= MAX_RUN_CONSTANT) {
                     updatedBadges.setRunBadges(prevRunBadges+1);
                     Log.d("calculations","Run badge");
@@ -505,6 +558,7 @@ public class DailyChallengeFragment extends Fragment {
 
                     Log.d("calculations","lunges badge");
                 }
+                //Write new badge numbers to the DB
                 badgeRef.child(auth.getUid()).setValue(updatedBadges);
             }
 
@@ -513,9 +567,5 @@ public class DailyChallengeFragment extends Fragment {
 
             }
         });
-    }
-
-    public void assignBadges(String badge) {
-        badgeRef.child(auth.getUid()).child(badge).setValue("true");
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,8 +46,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private User friend;
     private BadgeRecord badges;
 
+    private TextView badge1;
+    private TextView badge2;
+    private TextView badge3;
+    private TextView badge4;
+    private TextView badge5;
+    private TextView badge6;
+    private TextView badge7;
+    private TextView badge8;
+    private TextView badge9;
+
+
     private RecyclerView friendsList;
-    private RecyclerView badgeList;
+//    private RecyclerView badgeList;
     private DatabaseReference friendsDatabase;
     private DatabaseReference badgeDatabase;
     private FirebaseRecyclerOptions<Relationships> optionsFriends;
@@ -54,6 +66,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> adapter;
     private FirebaseRecyclerAdapter<BadgeRecord, ProfileFragment.UserViewHolder> adapterBadge;
     private int count = 1;
+
+    private String badge1Number;
+    private String badge2Number;
+    private String badge3Number;
+    private String badge4Number;
+    private String badge5Number;
+    private String badge6Number;
+    private String badge7Number;
+    private String badge8Number;
+    private String badge9Number;
+
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Information");
@@ -75,12 +98,25 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         friendsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         badgeDatabase = database.getReference().child("Badges").child(auth.getUid());
-        badgeList = (RecyclerView) view.findViewById(R.id.badgeList);
-        badgeList.setHasFixedSize(true);
-        badgeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+//        badgeList = (RecyclerView) view.findViewById(R.id.badgeList);
+//        badgeList.setHasFixedSize(true);
+//        badgeList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         DatabaseReference userRef = ref.child("users");
         getUserInfo(userRef);
+
+
+        badge1 = view.findViewById(R.id.badge1);
+        badge2 = view.findViewById(R.id.badge2);
+        badge3 = view.findViewById(R.id.badge3);
+        badge4 = view.findViewById(R.id.badge4);
+        badge5 = view.findViewById(R.id.badge5);
+        badge6 = view.findViewById(R.id.badge6);
+        badge7 = view.findViewById(R.id.badge7);
+        badge8 = view.findViewById(R.id.badge8);
+        badge9 = view.findViewById(R.id.badge9);
+
+
 
         userName = view.findViewById(R.id.userName);
         userEmail = view.findViewById(R.id.userEmail);
@@ -111,7 +147,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         friendsList.setAdapter(adapter);
 //        badgeList.setAdapter(adapterBadge);
         adapter.startListening();
-        adapterBadge.startListening();
+
+        getBadges(badgeDatabase);
+//        badge1.setText("hello");
+//        badge2.setText("it's");
+//        badge3.setText("me");
     }
 
     public FirebaseRecyclerAdapter<Relationships, ProfileFragment.UserViewHolder> createAdapterFriends(FirebaseRecyclerOptions<Relationships> optionsFriends){
@@ -417,6 +457,41 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         });
         return friend;
+    }
+
+    public void getBadges(DatabaseReference badgeDatabase) {
+        badgeDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                BadgeRecord badgeRecord = dataSnapshot.getValue(BadgeRecord.class);
+                badge1Number = Integer.toString(badgeRecord.getRunBadges());
+                badge2Number = Integer.toString(badgeRecord.getPlankBadges());
+                badge3Number = Integer.toString(badgeRecord.getPushupBadges());
+                badge4Number = Integer.toString(badgeRecord.getPullupBadges());
+                badge5Number = Integer.toString(badgeRecord.getSitupBadges());
+                badge6Number = Integer.toString(badgeRecord.getSquatBadges());
+                badge7Number = Integer.toString(badgeRecord.getTricepBadges());
+                badge8Number = Integer.toString(badgeRecord.getJumpingBadges());
+                badge9Number = Integer.toString(badgeRecord.getLungeBadges());
+
+
+                badge1.setText("Run Badges: " + badge1Number);
+                badge2.setText("Plank Badges: " + badge2Number);
+                badge3.setText("Pushup Badges: " + badge3Number);
+                badge4.setText("Pullup Badges: " + badge4Number);
+                badge5.setText("Situp Badges: " + badge5Number);
+                badge6.setText("Squat Badges: " + badge6Number);
+                badge7.setText("Tricep Dip Badges: " + badge7Number);
+                badge8.setText("Jumping Jacks Badges: " + badge8Number);
+                badge9.setText("Lunge Badges: " + badge9Number);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }

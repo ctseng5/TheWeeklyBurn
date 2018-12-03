@@ -1,11 +1,13 @@
+/**
+ * Friends Fragment
+ * @authors: Jeffrey Kao & Michael Tseng
+ * Friends tab that is responsible for searching for and adding/removing friends
+ */
+
 package csx060.uga.edu.theweeklyburn;
 
-
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,16 +18,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SearchView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseListOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,10 +34,11 @@ import com.google.firebase.database.ValueEventListener;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Creates the Friends Fragment
  */
 public class FriendsFragment extends Fragment {
 
+    //Initialize global variables
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -57,6 +57,13 @@ public class FriendsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Creates the views
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,6 +81,9 @@ public class FriendsFragment extends Fragment {
         userList.setLayoutManager(new LinearLayoutManager(getContext()));
         searchView = view.findViewById(R.id.searchView);
 
+        /**
+         * Set the query based on what the user types into the search box
+         */
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -101,6 +111,9 @@ public class FriendsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * On start of the fragment, display all users
+     */
     @Override
     public void onStart(){
         super.onStart();
@@ -114,6 +127,11 @@ public class FriendsFragment extends Fragment {
         adapter.startListening();
     }
 
+    /**
+     * after running the query, display only the relevant results
+     * @param searchText
+     * @param orderByChild
+     */
     public void firebaseSearch(String searchText, String orderByChild){
         Query firebaseSearchQuery = userDatabase.orderByChild(orderByChild).startAt(searchText).endAt(searchText + "\uf8ff");
 
@@ -126,6 +144,11 @@ public class FriendsFragment extends Fragment {
         adapter.startListening();
     }
 
+    /**
+     * Creates a FirebaseRecyclerView to hold all the results
+     * @param options
+     * @return
+     */
     public FirebaseRecyclerAdapter<User, UserViewHolder> createAdapter(FirebaseRecyclerOptions<User> options){
         FirebaseRecyclerAdapter<User, UserViewHolder> createdadapter = new FirebaseRecyclerAdapter<User, UserViewHolder>(options){
             @Override
@@ -138,6 +161,7 @@ public class FriendsFragment extends Fragment {
                 viewHolder.setUserName(fullName);
                 viewHolder.setUserPhone(users.getPhoneNumber());
 
+                //Sets users profile pictures based on their number
                 switch(users.getProfilePicNum()){
                     case 0:
                         profileImage = "pro_pic_1";
@@ -169,6 +193,7 @@ public class FriendsFragment extends Fragment {
                 }
                 viewHolder.setUserImage(getResources().getIdentifier(profileImage, "drawable", getContext().getPackageName()));
 
+                //Fetch the users from the DB
                 RelationRef.child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -176,6 +201,7 @@ public class FriendsFragment extends Fragment {
                             for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 selectedFriendUID = snapshot.getKey().toString();
 
+                                //If the user is a friend, show "remove" instead of "add" button
                                 if (otherUid.equalsIgnoreCase(selectedFriendUID)) {
                                     String addRemoveText = "Remove";
                                     viewHolder.addRemoveButton.setText(addRemoveText);
@@ -191,6 +217,7 @@ public class FriendsFragment extends Fragment {
                     }
                 });
 
+                //If friend is not the user, show the button, else, hide the button
                 if(!users.getEmail().equalsIgnoreCase(currentUserEmail)) {
                     viewHolder.addRemoveButton.setOnClickListener(new OnClickListener() {
                         @Override
@@ -224,6 +251,9 @@ public class FriendsFragment extends Fragment {
         return createdadapter;
     }
 
+    /**
+     * Creates the UserViewHolder to hold a user record in the results
+     */
     public class UserViewHolder extends RecyclerView.ViewHolder{
         TextView userName;
         TextView userPhone;
@@ -239,27 +269,49 @@ public class FriendsFragment extends Fragment {
             addRemoveButton = itemView.findViewById(R.id.addRemoveButton);
         }
 
+        /**
+         * set the user's name
+         * @param fullName
+         */
         public void setUserName(String fullName){
             String nameText = "Name: " + fullName;
             userName.setText(nameText);
         }
 
+        /**
+         * set the user's phone number
+         * @param phone
+         */
         public void setUserPhone(String phone){
             String phoneText = "Phone: " + phone;
             userPhone.setText(phoneText);
         }
 
+        /**
+         * set the user's picture
+         * @param image
+         */
         public void setUserImage(int image){
             userImage.setImageResource(image);
         }
     }
 
+    /**
+     * Adding a friend will add friend's UID to user's record, and add user's UID to friend's record
+     * @param friendName
+     * @param friendUID
+     */
     public void addNewFriend(String friendName, String friendUID) {
         RelationRef.child(auth.getUid()).child(friendUID).setValue(new Relationships("friend", friendUID));
         RelationRef.child(friendUID).child(auth.getUid()).setValue(new Relationships("friend", auth.getUid()));
         Toast.makeText(getActivity(), friendName + " was added as your friend", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Removing a friend will remove friend's UID from user's record and remove user's UID from friend's record
+     * @param friendName
+     * @param friendUID
+     */
     public void removeFriend(String friendName, String friendUID) {
         RelationRef.child(auth.getUid()).child(friendUID).removeValue();
         RelationRef.child(friendUID).child(auth.getUid()).removeValue();
