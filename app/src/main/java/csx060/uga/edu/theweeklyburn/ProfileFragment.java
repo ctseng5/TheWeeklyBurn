@@ -320,27 +320,40 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         badgeDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                BadgeRecord badgeRecord = dataSnapshot.getValue(BadgeRecord.class);
-                badge1Number = Integer.toString(badgeRecord.getRunBadges());
-                badge2Number = Integer.toString(badgeRecord.getPlankBadges());
-                badge3Number = Integer.toString(badgeRecord.getPushupBadges());
-                badge4Number = Integer.toString(badgeRecord.getPullupBadges());
-                badge5Number = Integer.toString(badgeRecord.getSitupBadges());
-                badge6Number = Integer.toString(badgeRecord.getSquatBadges());
-                badge7Number = Integer.toString(badgeRecord.getTricepBadges());
-                badge8Number = Integer.toString(badgeRecord.getJumpingBadges());
-                badge9Number = Integer.toString(badgeRecord.getLungeBadges());
+                if(dataSnapshot.exists()) {
+                    BadgeRecord badgeRecord = dataSnapshot.getValue(BadgeRecord.class);
+                    badge1Number = Integer.toString(badgeRecord.getRunBadges());
+                    badge2Number = Integer.toString(badgeRecord.getPlankBadges());
+                    badge3Number = Integer.toString(badgeRecord.getPushupBadges());
+                    badge4Number = Integer.toString(badgeRecord.getPullupBadges());
+                    badge5Number = Integer.toString(badgeRecord.getSitupBadges());
+                    badge6Number = Integer.toString(badgeRecord.getSquatBadges());
+                    badge7Number = Integer.toString(badgeRecord.getTricepBadges());
+                    badge8Number = Integer.toString(badgeRecord.getJumpingBadges());
+                    badge9Number = Integer.toString(badgeRecord.getLungeBadges());
 
 
-                badge1.setText("Run Badges: " + badge1Number);
-                badge2.setText("Plank Badges: " + badge2Number);
-                badge3.setText("Pushup Badges: " + badge3Number);
-                badge4.setText("Pullup Badges: " + badge4Number);
-                badge5.setText("Situp Badges: " + badge5Number);
-                badge6.setText("Squat Badges: " + badge6Number);
-                badge7.setText("Tricep Dip Badges: " + badge7Number);
-                badge8.setText("Jumping Jacks Badges: " + badge8Number);
-                badge9.setText("Lunge Badges: " + badge9Number);
+                    badge1.setText("Run Badges: " + badge1Number);
+                    badge2.setText("Plank Badges: " + badge2Number);
+                    badge3.setText("Pushup Badges: " + badge3Number);
+                    badge4.setText("Pullup Badges: " + badge4Number);
+                    badge5.setText("Situp Badges: " + badge5Number);
+                    badge6.setText("Squat Badges: " + badge6Number);
+                    badge7.setText("Tricep Dip Badges: " + badge7Number);
+                    badge8.setText("Jumping Jacks Badges: " + badge8Number);
+                    badge9.setText("Lunge Badges: " + badge9Number);
+                }
+                else {
+                    badge1.setText("Run Badges: 0");
+                    badge2.setText("Plank Badges: 0");
+                    badge3.setText("Pushup Badges: 0");
+                    badge4.setText("Pullup Badges: 0");
+                    badge5.setText("Situp Badges: 0");
+                    badge6.setText("Squat Badges: 0");
+                    badge7.setText("Tricep Dip Badges: 0");
+                    badge8.setText("Jumping Jacks Badges: 0");
+                    badge9.setText("Lunge Badges: 0");
+                }
 
             }
 

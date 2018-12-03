@@ -49,9 +49,28 @@ public class FriendProfileActivity extends AppCompatActivity {
     private String uid = "";
     private User friend;
 
+    private TextView badge1;
+    private TextView badge2;
+    private TextView badge3;
+    private TextView badge4;
+    private TextView badge5;
+    private TextView badge6;
+    private TextView badge7;
+    private TextView badge8;
+    private TextView badge9;
+
+    private String badge1Number;
+    private String badge2Number;
+    private String badge3Number;
+    private String badge4Number;
+    private String badge5Number;
+    private String badge6Number;
+    private String badge7Number;
+    private String badge8Number;
+    private String badge9Number;
 
     private RecyclerView friendsList;
-    private RecyclerView badgeList;
+//    private RecyclerView badgeList;
     private DatabaseReference friendsDatabase;
     private DatabaseReference badgeDatabase;
     private FirebaseRecyclerOptions<Relationships> optionsFriends;
@@ -81,12 +100,22 @@ public class FriendProfileActivity extends AppCompatActivity {
         friendsList.setLayoutManager(new LinearLayoutManager(getBaseContext(), LinearLayoutManager.HORIZONTAL, false));
 
         badgeDatabase = database.getReference().child("Badges").child(uid);
-        badgeList = (RecyclerView) findViewById(R.id.badgeList);
-        badgeList.setHasFixedSize(true);
-        badgeList.setLayoutManager(new LinearLayoutManager(getBaseContext(), LinearLayoutManager.HORIZONTAL, false));
+//        badgeList = (RecyclerView) findViewById(R.id.badgeList);
+//        badgeList.setHasFixedSize(true);
+//        badgeList.setLayoutManager(new LinearLayoutManager(getBaseContext(), LinearLayoutManager.HORIZONTAL, false));
 
         DatabaseReference userRef = ref.child("users");
         getUserInfo(userRef);
+
+        badge1 = findViewById(R.id.badge1);
+        badge2 = findViewById(R.id.badge2);
+        badge3 = findViewById(R.id.badge3);
+        badge4 = findViewById(R.id.badge4);
+        badge5 = findViewById(R.id.badge5);
+        badge6 = findViewById(R.id.badge6);
+        badge7 = findViewById(R.id.badge7);
+        badge8 = findViewById(R.id.badge8);
+        badge9 = findViewById(R.id.badge9);
 
         userName = findViewById(R.id.userName);
         userEmail = findViewById(R.id.userEmail);
@@ -108,6 +137,8 @@ public class FriendProfileActivity extends AppCompatActivity {
         adapter = createAdapterFriends(optionsFriends);
         friendsList.setAdapter(adapter);
         adapter.startListening();
+
+        getBadges(badgeDatabase);
     }
 
     /**
@@ -279,6 +310,54 @@ public class FriendProfileActivity extends AppCompatActivity {
             }
         });
         return friend;
+    }
+
+    public void getBadges(DatabaseReference badgeDatabase) {
+        badgeDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    BadgeRecord badgeRecord = dataSnapshot.getValue(BadgeRecord.class);
+                    badge1Number = Integer.toString(badgeRecord.getRunBadges());
+                    badge2Number = Integer.toString(badgeRecord.getPlankBadges());
+                    badge3Number = Integer.toString(badgeRecord.getPushupBadges());
+                    badge4Number = Integer.toString(badgeRecord.getPullupBadges());
+                    badge5Number = Integer.toString(badgeRecord.getSitupBadges());
+                    badge6Number = Integer.toString(badgeRecord.getSquatBadges());
+                    badge7Number = Integer.toString(badgeRecord.getTricepBadges());
+                    badge8Number = Integer.toString(badgeRecord.getJumpingBadges());
+                    badge9Number = Integer.toString(badgeRecord.getLungeBadges());
+
+
+                    badge1.setText("Run Badges: " + badge1Number);
+                    badge2.setText("Plank Badges: " + badge2Number);
+                    badge3.setText("Pushup Badges: " + badge3Number);
+                    badge4.setText("Pullup Badges: " + badge4Number);
+                    badge5.setText("Situp Badges: " + badge5Number);
+                    badge6.setText("Squat Badges: " + badge6Number);
+                    badge7.setText("Tricep Dip Badges: " + badge7Number);
+                    badge8.setText("Jumping Jacks Badges: " + badge8Number);
+                    badge9.setText("Lunge Badges: " + badge9Number);
+                }
+                else {
+                    badge1.setText("Run Badges: 0");
+                    badge2.setText("Plank Badges: 0");
+                    badge3.setText("Pushup Badges: 0");
+                    badge4.setText("Pullup Badges: 0");
+                    badge5.setText("Situp Badges: 0");
+                    badge6.setText("Squat Badges: 0");
+                    badge7.setText("Tricep Dip Badges: 0");
+                    badge8.setText("Jumping Jacks Badges: 0");
+                    badge9.setText("Lunge Badges: 0");
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
